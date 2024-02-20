@@ -1,6 +1,6 @@
-[submodule ".config"]
-	path = .config
-	url = https://github.com/maestro-bene/.config
+[submodule "nvim"]
+	path = nvim
+	url = https://github.com/maestro-bene/init.lua
 [submodule "alacritty/catppuccin"]
 	path = alacritty/catppuccin
 	url = https://github.com/catppuccin/alacritty
