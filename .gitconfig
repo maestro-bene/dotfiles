@@ -3,3 +3,6 @@
 [core]
 	autocrlf = input
 	editor = nvim
+[user]
+	name = maestro-bene
+	email = gael.cudennec@gmail.com
