@@ -10,10 +10,6 @@
 [color]
     ui = auto
 
-# Set the default text editor for Git commit messages (replace with your preferred editor)
-[core]
-    editor = nvim
-
 # Configure Git to use rebase by default when pulling
 [pull]
     rebase = true
