@@ -1,8 +1,38 @@
-[init]
-	defaultBranch = main
 [core]
 	autocrlf = input
 	editor = nvim
+
 [user]
 	name = maestro-bene
-	email = gael.cudennec@gmail.com
+    email = gael.cudennec@gmail.com
+    
+# Enable colored output for Git commands
+[color]
+    ui = auto
+
+# Set the default text editor for Git commit messages (replace with your preferred editor)
+[core]
+    editor = nvim
+
+# Configure Git to use rebase by default when pulling
+[pull]
+    rebase = true
+
+# Set the default branch name for new repositories (optional)
+[init]
+    defaultBranch = main
+
+# Enable Git to automatically correct simple typos when running commands
+[help]
+    autocorrect = 1
+
+# Define custom aliases for frequently used Git commands
+[alias]
+    st = status
+    br = branch
+    co = checkout
+    cm = commit
+    df = diff
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+
