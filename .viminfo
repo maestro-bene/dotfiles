@@ -18,7 +18,7 @@ $
 
 # Command Line History (newest to oldest):
 :q
-|2,0,1707486523,,"q"
+|2,0,1716653182,,"q"
 :q!
 |2,0,1701865075,,"q!"
 :wq
@@ -118,6 +118,16 @@ $
 # Jumplist (newest first):
 -'  1  0  ~
 |4,39,1,0,1711564466,"~"
+-'  1  0  ~
+|4,39,1,0,1711564466,"~"
+-'  34  55  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,34,55,1706803569,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  34  55  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,34,55,1706803569,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  34  55  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,34,55,1706803569,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  34  55  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,34,55,1706803569,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
 -'  34  55  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
 |4,39,34,55,1706803569,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
 -'  34  55  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
@@ -134,6 +144,22 @@ $
 |4,39,937,8,1706803528,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
 -'  937  8  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
 |4,39,937,8,1706803528,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  937  8  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,937,8,1706803528,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  937  8  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,937,8,1706803528,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  937  8  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,937,8,1706803528,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  937  8  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,937,8,1706803528,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,1,0,1706803504,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,1,0,1706803504,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,1,0,1706803504,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
+|4,39,1,0,1706803504,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
 -'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
 |4,39,1,0,1706803504,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5"
 -'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutor6mcnZ5
@@ -150,6 +176,22 @@ $
 |4,39,1006,2,1701865075,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
 -'  1006  2  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
 |4,39,1006,2,1701865075,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1006  2  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1006,2,1701865075,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1006  2  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1006,2,1701865075,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1006  2  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1006,2,1701865075,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1006  2  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1006,2,1701865075,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1,0,1701865039,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1,0,1701865039,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1,0,1701865039,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
+|4,39,1,0,1701865039,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
 -'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
 |4,39,1,0,1701865039,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0"
 -'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorNL4FY0
@@ -166,6 +208,22 @@ $
 |4,39,60,25,1701865037,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
 -'  60  25  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
 |4,39,60,25,1701865037,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  60  25  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,60,25,1701865037,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  60  25  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,60,25,1701865037,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  60  25  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,60,25,1701865037,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  60  25  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,60,25,1701865037,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,1,0,1701864903,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,1,0,1701864903,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,1,0,1701864903,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
+-'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
+|4,39,1,0,1701864903,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
 -'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
 |4,39,1,0,1701864903,"/private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w"
 -'  1  0  /private/var/folders/pn/gxnj_3j50dn262_pzs2dxbqh0000gn/T/tutorGPuo1w
@@ -190,6 +248,22 @@ $
 |4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
 -'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
 |4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
+-'  1  0  ~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish
+|4,39,1,0,1699371221,"~/.nvim/undodir/%Users%maestro-bene%.config%fish%config.fish"
 -'  9  0  ~/.config/fish/config.fish
 |4,39,9,0,1699371173,"~/.config/fish/config.fish"
 -'  9  0  ~/.config/fish/config.fish
@@ -222,98 +296,24 @@ $
 |4,39,9,0,1699371173,"~/.config/fish/config.fish"
 -'  9  0  ~/.config/fish/config.fish
 |4,39,9,0,1699371173,"~/.config/fish/config.fish"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  1  0  ~/NetrwMessage
-|4,39,1,0,1699370458,"~/NetrwMessage"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  1  0  ~
-|4,39,1,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  1  0  ~
-|4,39,1,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  1  0  ~
-|4,39,1,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  1  0  ~
-|4,39,1,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  1  0  ~
-|4,39,1,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
--'  1  0  ~
-|4,39,1,0,1699370452,"~"
--'  62  0  ~
-|4,39,62,0,1699370452,"~"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
+-'  9  0  ~/.config/fish/config.fish
+|4,39,9,0,1699371173,"~/.config/fish/config.fish"
 
 # History of marks within files (newest to oldest):
 
