@@ -1,0 +1,95 @@
+" Optionnel : meilleure portabilité
+set runtimepath^=~/.vim runtimepath+=~/.vim/after
+set packpath^=~/.vim
+
+" Active Pathogen
+execute pathogen#infect()
+
+" Thème Catppuccin
+syntax enable
+set background=dark
+set termguicolors
+colorscheme catppuccin_mocha
+let g:airline_theme = 'catppuccin_mocha'
+
+" Options de base (à adapter selon tes goûts)
+let mapleader = " "
+set number
+set relativenumber
+set tabstop=4
+set shiftwidth=4
+set nowrap
+set expandtab
+set ignorecase
+set smartcase
+set cursorline
+set cindent cinkeys-=0#
+filetype plugin indent on
+
+
+" Définir le type de fichier pour les fichiers .conf et .conf.template
+au BufEnter *.conf,*.conf.template set filetype=json
+au BufEnter *.conf,*.conf.template set syntax=ruby
+
+" Airline
+let g:airline_section_z = '%l : %c'
+let g:airline_section_warning = ''
+"let g:airline_section_error = ''
+
+
+" Undotree : gestion visuelle de l'historique d'annulation
+let g:undotree_WindowLayout = 2 " (optionnel : layout vertical)
+set undofile
+set undodir=~/.local/share/vim/undodir
+
+set laststatus=2
+set showtabline=2
+set guioptions-=e
+
+" Source les remaps personnalisés
+if filereadable(expand('~/.vim/remaps.vim'))
+  source ~/.vim/remaps.vim
+endif
+
+let g:switch_custom_definitions =
+  \ [
+  \   ['true', 'false'],
+  \   ['True', 'False'],
+  \   ['TRUE', 'FALSE'],
+  \   ['yes', 'no'],
+  \   ['Yes', 'No'],
+  \   ['YES', 'NO'],
+  \   ['on', 'off'],
+  \   ['On', 'Off'],
+  \   ['ON', 'OFF'],
+  \   ['enable', 'disable'],
+  \   ['Enable', 'Disable'],
+  \   ['ENABLED', 'DISABLED'],
+  \   ['enabled', 'disabled'],
+  \   ['start', 'stop'],
+  \   ['up', 'down'],
+  \   ['left', 'right'],
+  \   ['in', 'out'],
+  \   ['open', 'close'],
+  \   ['before', 'after'],
+  \   ['min', 'max'],
+  \   ['increase', 'decrease'],
+  \   ['increment', 'decrement'],
+  \   ['next', 'previous'],
+  \   ['first', 'last'],
+  \   ['odd', 'even'],
+  \   ['add', 'remove'],
+  \   ['accept', 'reject'],
+  \   ['begin', 'end'],
+  \   ['forward', 'backward'],
+  \   ['front', 'back'],
+  \   ['top', 'bottom'],
+  \   ['high', 'low'],
+  \   ['input', 'output'],
+  \   ['include', 'exclude'],
+  \   ['show', 'hide'],
+  \   ['expand', 'collapse'],
+  \   ['ascending', 'descending'],
+  \   ['asc', 'desc'],
+  \ ]
+

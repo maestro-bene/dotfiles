@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "catppuccin",
+  "autoupdate": true,
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (OpenAI-compatible)",
+      "options": {
+        "baseURL": "https://llm.openrama.tech.orange:443/v1"
+      },
+      "models": {
+        "gemma3-12b": { "name": "gemma3-12b" },
+        "deepseek-coder-v2-16b": { "name": "deepseek-coder-v2-16b" },
+        "llama3.2-3b": { "name": "llama3.2-3b" },
+        "qwen2.5-coder-7b": { "name": "qwen2.5-coder-7b" },
+        "nomic-embed-text-latest": { "name": "nomic-embed-text-latest" },
+        "gpt-oss-20b": { "name": "gpt-oss-20b" },
+        "ministral-3-8b": { "name": "ministral-3-8b" }
+      }
+    }
+  }
+}

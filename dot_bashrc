@@ -1,0 +1,9 @@
+# ~/.bashrc
+
+if [ -f ~/.bashrc_minimal ]; then
+    source ~/.bashrc_minimal
+fi
+
+if [ -f ~/.bashrc_wsl ]; then
+    source ~/.bashrc_wsl
+fi

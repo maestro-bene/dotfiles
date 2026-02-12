@@ -1,0 +1,16 @@
+Include ~/toolpos/home/ssh/config.d/*
+
+Host *
+    AddKeysToAgent yes
+    IdentitiesOnly yes
+    IdentityAgent $SSH_AUTH_SOCK
+    PubkeyAuthentication yes
+    PreferredAuthentications publickey,password
+	TCPKeepAlive yes
+	ServerAliveInterval 30
+	ServerAliveCountMax 10
+	StrictHostKeyChecking no
+	ControlMaster auto
+	ControlPersist 4h
+    ControlPath ~/.ssh/mux-%h
+	Include conf.d/*

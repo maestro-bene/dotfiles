@@ -1,0 +1,10 @@
+---
+# ~/.aider.conf.yml
+vim: true
+gitignore: true
+show-model-warnings: false
+map-multiplier-no-files: 0
+model: openai/ministral-3-8b
+weak-model: openai/llama3.2-3b
+openai-api-base: https://llm.openrama.tech.orange:443/
+openai-api-key: "{{ pass "chezmoi/openrama_api_key" }}"

@@ -1,0 +1,22 @@
+[user]
+    name = gael.cudennec
+    email = gael.cudennec@orange.com
+    signingkey = {{ pass "chezmoi/git_signing_key" }}
+[http "https://gitlab.tech.orange"]
+    proxy = http://10.253.51.50:8080
+[https "https://gitlab.tech.orange"]
+    proxy = http://10.253.51.50:8080
+[init]
+    defaultBranch = main
+[credential]
+    helper = store
+[safe]
+	directory = /home/maestro-bene/LAB/longuetown/SAMU
+[gpg]
+	format = x509
+[gpg "x509"]
+	program = smimesign.exe
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true

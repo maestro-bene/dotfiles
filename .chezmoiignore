@@ -1,0 +1,4 @@
+**/node_modules/**
+**/secrets.fish
+**/fish_variables
+key.txt.age
