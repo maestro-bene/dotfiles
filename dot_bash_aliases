@@ -14,5 +14,3 @@ alias l='ls -CF'
 alias ls='ls -Al'
 alias c='clear'
 alias e='exit'
-
-alias dotfiles='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
