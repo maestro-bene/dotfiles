@@ -36,7 +36,9 @@
 
 [gpg "x509"]
     program = smimesign.exe
+
 {{- else }}
+
 [gpg]
     format = openpgp
 {{- end }}
