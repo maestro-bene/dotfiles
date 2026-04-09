@@ -9,10 +9,5 @@ alias vim "nvim"
 alias vnim "nvim"
 alias ivm "vim"
 
-alias ls "lsd"
-alias l "ls -l"
-alias la "ls -a"
-alias lla "ls -la"
-alias lt "ls --tree"
-
 alias dotfiles='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
+alias avante='nvim -c "lua vim.defer_fn(function()require(\"avante.api\").zen_mode()end, 100)"'

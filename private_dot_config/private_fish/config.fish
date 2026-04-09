@@ -37,7 +37,16 @@ end
 
 # Starship
 if command -v starship >/dev/null
+    function starship_transient_prompt_func
+      starship module hostname
+      starship module directory
+      starship module character
+    end
+    function starship_transient_rprompt_func
+      starship module time
+    end
     starship init fish | source
+    enable_transience
     set -x STARSHIP_SHELL fish
     log "✅ Starship configuré"
 else
@@ -65,6 +74,7 @@ end
 # Bat
 if command -v bat >/dev/null
     set -Ux BAT_THEME "Catppuccin Mocha"
+    set -Ux MANPAGER "sh -c 'col -bx | bat -l man -p'"
     log "✅ Bat configuré avec thème Catppuccin Mocha"
 else
     log "❌ Bat non trouvé"
@@ -134,7 +144,9 @@ end
 # Language specific (conditional)
 if command -v go >/dev/null
     set -Ux GOPATH (go env GOPATH)
+    set -Ux GOBIN $GOPATH/bin
     log "✅ GOPATH configuré"
+    fish_add_path $GOBIN
 end
 
 # =========================
@@ -143,6 +155,7 @@ end
 
 if command -v nvim >/dev/null
     set -Ux EDITOR nvim
+    set -Ux GIT_EDITOR nvim
     set -Ux VISUAL nvim
     log "✅ Neovim configuré comme éditeur par défaut"
     
@@ -153,11 +166,6 @@ if command -v nvim >/dev/null
     else
         log "⚠️ Mason bin non trouvé ($mason_bin)"
         log "💡 Installer Mason dans Neovim avec : :Lazy install mason-lspconfig.nvim"
-    end
-    
-    if test -n "$NVIM_LISTEN_ADDRESS"
-        set -x MANPAGER "/usr/local/bin/nvr -c 'Man!' -o -"
-        log "✅ Manpager configuré pour Neovim"
     end
 else
     log "❌ Neovim non trouvé"
@@ -193,6 +201,10 @@ set -U fish_greeting ""  # disable fish greeting
 set -U fish_key_bindings fish_vi_key_bindings
 set -U fish_cursor_default block
 set -U fish_cursor_insert line
+set -Ux BROWSER firefox
+
+source ~/.config/fish/conf.d/abbr.fish
+source ~/.config/fish/conf.d/alias.fish
 
 # Locale
 set -U LANG en_US.UTF-8
@@ -215,6 +227,7 @@ end
 
 set -x NO_PROXY "localhost,127.0.0.1,::1"
 set -x no_proxy "localhost,127.0.0.1,::1"
+set -Ux LAZYGIT_NEW_DIR_FILE $HOME/.lazygit/newdir
 
 # =========================
 # Service Management
@@ -261,9 +274,6 @@ if status is-interactive
     log "🔧 Mode interactif activé"
     # Execute custom scripts only in interactive mode
     # log_function ~/.config/bin/mount_sshfs
-
-    # dotfiles_sync >/dev/null 2>&1 &
-    # disown
 end
 
 # =========================

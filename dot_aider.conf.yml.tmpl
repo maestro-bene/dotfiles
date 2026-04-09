@@ -4,7 +4,7 @@ vim: true
 gitignore: true
 show-model-warnings: false
 map-multiplier-no-files: 0
-model: openai/ministral-3-8b
+model: openai/qwen2.5-coder-7b
 weak-model: openai/llama3.2-3b
-openai-api-base: https://llm.openrama.tech.orange:443/
-openai-api-key: "{{ pass "chezmoi/openrama_api_key" }}"
+openai-api-base: {{ pass "chezmoi/work/ai_api_url" }}
+openai-api-key: "{{ pass "chezmoi/work/ai_api_key" }}"

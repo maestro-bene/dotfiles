@@ -1,4 +1,6 @@
-Include ~/toolpos/home/ssh/config.d/*
+{{- if eq .profile "work" }}
+Include {{ pass "chezmoi/work/ssh_include_path_1" }}
+{{- end }}
 
 Host *
     AddKeysToAgent yes
@@ -13,4 +15,4 @@ Host *
 	ControlMaster auto
 	ControlPersist 4h
     ControlPath ~/.ssh/mux-%h
-	Include conf.d/*
+	Include config.d/*

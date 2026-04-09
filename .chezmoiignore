@@ -1,4 +1,27 @@
 **/node_modules/**
-**/secrets.fish
-**/fish_variables
+**/bun.lock
+**/package.json
+
 key.txt.age
+
+# Ignore tout le dossier fish
+**/private_fish/**
+
+# Ré-inclure uniquement ce qu'on veut versionner
+!**/private_fish/config.fish
+!**/private_fish/fish_plugins
+
+!**/private_fish/conf.d/abbr.fish
+!**/private_fish/conf.d/alias.fish
+!**/private_fish/conf.d/fzf-custom.fish
+
+!**/private_fish/functions/brew_outdated_count.fish
+!**/private_fish/functions/detect_current_os.fish
+!**/private_fish/functions/docker.fish
+!**/private_fish/functions/log.fish
+!**/private_fish/functions/log_function.fish
+!**/private_fish/functions/ssh-clear.fish
+!**/private_fish/functions/ssh-restart.fish
+!**/private_fish/functions/ssh-status.fish
+
+!**/private_fish/themes/Catppuccin Mocha.theme

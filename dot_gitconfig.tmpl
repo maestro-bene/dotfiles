@@ -1,20 +1,42 @@
 [user]
-    name = gael.cudennec
-    email = gael.cudennec@orange.com
-    signingkey = {{ pass "chezmoi/git_signing_key" }}
-[http "https://gitlab.tech.orange"]
-    proxy = http://10.253.51.50:8080
-[https "https://gitlab.tech.orange"]
-    proxy = http://10.253.51.50:8080
+{{- if eq .profile "work" }}
+    name = {{ pass "chezmoi/work/git_user_name" }}
+    email = {{ pass "chezmoi/work/git_user_email" }}
+    signingkey = {{ pass "chezmoi/work/git_signing_key" }}
+
+{{- else }}
+    name = {{ pass "chezmoi/personal/git_user_name" }}
+    email = {{ pass "chezmoi/personal/git_user_email" }}
+
+{{- end }}
+
+{{- if eq .profile "work" }}
+[http "https://{{ pass "chezmoi/work/gitlab_host_1" }}"]
+    proxy = {{ pass "chezmoi/work/gitlab_1_proxy" }}
+
+[https "https://{{ pass "chezmoi/work/gitlab_host_1" }}"]
+    proxy = {{ pass "chezmoi/work/gitlab_1_proxy" }}
+{{- end }}
+
 [init]
     defaultBranch = main
+
 [credential]
     helper = store
-[gpg]
-	format = x509
-[gpg "x509"]
-	program = smimesign.exe
+
 [commit]
 	gpgsign = true
+
 [tag]
 	gpgsign = true
+
+{{- if eq .profile "work" }}
+[gpg]
+    format = x509
+
+[gpg "x509"]
+    program = smimesign.exe
+{{- else }}
+[gpg]
+    format = openpgp
+{{- end }}

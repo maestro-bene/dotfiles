@@ -1,108 +1,22 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Sets user-defined palette
-# Palettes must be defined _after_ this line
-palette = "catppuccin_macchiato"
+palette = "catppuccin_mocha"
 
-# Starship modules
-[character]
-# Note the use of Catppuccin color 'peach'
-success_symbol = "[[󰄛](green) ❯](peach)"
-error_symbol = "[[󰄛](red) ❯](peach)"
-vimcmd_symbol = "[󰄛 ❮](subtext1)" # For use with zsh-vi-mode
+# custom format
+format = """
+[╭─ $shell────$custom_brew────────$memory_usage──╌╌ $git_branch$git_metrics$git_commit$aws$buf$bun$c$cmake$conda$crystal$dart$deno$docker_context$elixir$elm$fennel$fortran$fossil_branch$gcloud$golang$gradle$guix_shell$haskell$haxe$hg_branch$java$julia$kotlin$lua$meson$nim$nix_shell$nodejs$ocaml$package$perl$php$pijul_channel$pixi$python$rlang$ruby$rust$scala$swift$xmake$zig$cmd_duration](overlay0)
+[├─](overlay0)$sudo$username$hostname $directory$read_only
+[╰─ $os$character](overlay0)"""
 
-[git_branch]
-style = "mauve"
+#format = '$all$directory$character'
 
-[directory]
-truncation_length = 4
-style = "lavender"
+# Wait 10 milliseconds for starship to check files under the current directory.
+scan_timeout = 100
+command_timeout = 500
+add_newline = true
 
-# Palette definitions
-[palettes.catppuccin_latte]
-rosewater = "#dc8a78"
-flamingo = "#dd7878"
-pink = "#ea76cb"
-mauve = "#8839ef"
-red = "#d20f39"
-maroon = "#e64553"
-peach = "#fe640b"
-yellow = "#df8e1d"
-green = "#40a02b"
-teal = "#179299"
-sky = "#04a5e5"
-sapphire = "#209fb5"
-blue = "#1e66f5"
-lavender = "#7287fd"
-text = "#4c4f69"
-subtext1 = "#5c5f77"
-subtext0 = "#6c6f85"
-overlay2 = "#7c7f93"
-overlay1 = "#8c8fa1"
-overlay0 = "#9ca0b0"
-surface2 = "#acb0be"
-surface1 = "#bcc0cc"
-surface0 = "#ccd0da"
-base = "#eff1f5"
-mantle = "#e6e9ef"
-crust = "#dce0e8"
-
-[palettes.catppuccin_frappe]
-rosewater = "#f2d5cf"
-flamingo = "#eebebe"
-pink = "#f4b8e4"
-mauve = "#ca9ee6"
-red = "#e78284"
-maroon = "#ea999c"
-peach = "#ef9f76"
-yellow = "#e5c890"
-green = "#a6d189"
-teal = "#81c8be"
-sky = "#99d1db"
-sapphire = "#85c1dc"
-blue = "#8caaee"
-lavender = "#babbf1"
-text = "#c6d0f5"
-subtext1 = "#b5bfe2"
-subtext0 = "#a5adce"
-overlay2 = "#949cbb"
-overlay1 = "#838ba7"
-overlay0 = "#737994"
-surface2 = "#626880"
-surface1 = "#51576d"
-surface0 = "#414559"
-base = "#303446"
-mantle = "#292c3c"
-crust = "#232634"
-
-[palettes.catppuccin_macchiato]
-rosewater = "#f4dbd6"
-flamingo = "#f0c6c6"
-pink = "#f5bde6"
-mauve = "#c6a0f6"
-red = "#ed8796"
-maroon = "#ee99a0"
-peach = "#f5a97f"
-yellow = "#eed49f"
-green = "#a6da95"
-teal = "#8bd5ca"
-sky = "#91d7e3"
-sapphire = "#7dc4e4"
-blue = "#8aadf4"
-lavender = "#b7bdf8"
-text = "#cad3f5"
-subtext1 = "#b8c0e0"
-subtext0 = "#a5adcb"
-overlay2 = "#939ab7"
-overlay1 = "#8087a2"
-overlay0 = "#6e738d"
-surface2 = "#5b6078"
-surface1 = "#494d64"
-surface0 = "#363a4f"
-base = "#24273a"
-mantle = "#1e2030"
-crust = "#181926"
+# Catppuchin Theme
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
@@ -131,4 +45,153 @@ surface0 = "#313244"
 base = "#1e1e2e"
 mantle = "#181825"
 crust = "#11111b"
+
+[shell]
+fish_indicator = '🐟'
+bash_indicator = 'bash'
+unknown_indicator = 'unknown'
+style = 'text'
+disabled = false
+
+[sudo]
+symbol = '🧙'
+format = ' $symbol'
+disabled = false
+
+[username]
+style_user = 'lavender'
+format = ' [$user]($style)'
+disabled = false
+show_always = true
+
+
+[hostname]
+ssh_only = true
+ssh_symbol = " "
+format = '[$ssh_symbol](pink)[$hostname](sapphire)'
+trim_at = ''
+disabled = false
+
+[os]
+disabled = false
+format = "[$symbol]($style) "
+style = "text"
+
+[memory_usage]
+symbol = "󰍛"
+disabled = false
+threshold = 50
+format = ' [$symbol $ram_pct]($style) '
+style = 'peach'
+
+[custom.brew]
+command = "fish -c 'brew_outdated_count 3600'"
+when = "command -v brew >/dev/null 2>&1"
+shell = ["sh", "-c"]  # laisse Starship lancer fish via sh -c
+format = "[$symbol$output]($style) "
+symbol = "🍺 "
+style = "peach"
+
+[localip]
+ssh_only = false
+format = '[@$localipv4](blue) '
+disabled = false
+
+[git_metrics]
+disabled = false
+format = ' [+$added](green) [-$deleted](red) '
+
+[git_branch]
+symbol = ""
+format = '[$symbol $branch(:$remote_branch)]($style)'
+style = 'pink'
+
+[git_commit]
+disabled = false
+tag_symbol = '  '
+
+[cmd_duration]
+min_time = 500
+format = ' took [$duration](rosewater)'
+
+[directory]
+fish_style_pwd_dir_length = 7
+disabled = false
+truncation_length = 4
+truncation_symbol = '…/'
+read_only = " 󰌾"
+read_only_style = 'dimmed blue'
+style = 'blue'
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](subtext1)" # For use with zsh-vi-mode
+
+# battery
+[battery]
+full_symbol = '● '
+charging_symbol = '◉ '
+discharging_symbol = '◯ '
+
+[[battery.display]]
+threshold = 20
+style = 'red'
+
+[[battery.display]]
+threshold = 100
+style = 'teal'
+
+
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+AOSC = " "
+Arch = " "
+Artix = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Elementary = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Ios = "󰀷 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+Zorin = " "
 

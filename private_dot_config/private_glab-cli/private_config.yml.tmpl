@@ -23,9 +23,12 @@ hosts:
     api_host: gitlab.com
     # Your GitLab access token. To get one, read https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
     token:
-  gitlab.tech.orange:
-    token: {{ pass "chezmoi/gitlab_token" }}
-    api_host: gitlab.tech.orange
+
+{{- if eq .profile "work" }}
+  {{ pass "chezmoi/work/gitlab_host_1" }}:
+    token: {{ pass "chezmoi/work/gitlab_1_token" }}
+    api_host: {{ pass "chezmoi/work/gitlab_host_1" }}
     git_protocol: ssh
     api_protocol: https
-    user: gael.cudennec
+    user: {{ pass "chezmoi/work/git_user_name" }}
+{{- end }}
