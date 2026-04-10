@@ -255,6 +255,7 @@ end
 # SSH Agent
 # =========================
 
+{{- if eq .profile "work" }}
 # SSH Agent avec Keychain
 if command -v keychain >/dev/null
     # Keychain avec options optimisées
@@ -265,6 +266,17 @@ if command -v keychain >/dev/null
 else
     echo "❌ Keychain not found. Install with: brew install keychain"
 end
+{{- else }}
+# YubiKey GPG/SSH pour fish
+set -gx SSH_AUTH_SOCK (gpgconf --list-dirs agent-ssh-socket | string trim)
+set -gx GPG_TTY (tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+
+# Auto-reload GPG agent à chaque nouveau terminal
+function __gpg_reloader --on-variable PWD --description 'Reload gpg agent on PWD change'
+  gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+end
+{{- end}}
 
 # =========================
 # Interactive shell scripts

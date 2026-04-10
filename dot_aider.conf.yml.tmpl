@@ -6,5 +6,7 @@ show-model-warnings: false
 map-multiplier-no-files: 0
 model: openai/qwen2.5-coder-7b
 weak-model: openai/llama3.2-3b
+{{- if eq .profile "work" }}
 openai-api-base: {{ pass "chezmoi/work/ai_api_url" }}
 openai-api-key: "{{ pass "chezmoi/work/ai_api_key" }}"
+{{- end }}
