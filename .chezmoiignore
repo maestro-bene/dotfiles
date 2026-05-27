@@ -25,3 +25,7 @@ key.txt.age
 !**/private_fish/functions/ssh-status.fish
 
 !**/private_fish/themes/Catppuccin Mocha.theme
+
+*dot_aider*
+*nvim/dependencies/*
+*nvim/db_ui/connections.json

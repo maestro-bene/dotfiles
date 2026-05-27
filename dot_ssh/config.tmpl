@@ -9,10 +9,10 @@ Host *
     PubkeyAuthentication yes
     PreferredAuthentications publickey,password
 	TCPKeepAlive yes
-	ServerAliveInterval 30
-	ServerAliveCountMax 10
-	StrictHostKeyChecking no
-	ControlMaster auto
-	ControlPersist 4h
+    ServerAliveInterval 30
+    ServerAliveCountMax 10
+    StrictHostKeyChecking no
+    ControlMaster auto
+    ControlPersist 10h
     ControlPath ~/.ssh/mux-%h
-	Include config.d/*
+    Include config.d/*

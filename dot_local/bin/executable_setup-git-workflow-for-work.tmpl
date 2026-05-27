@@ -1,0 +1,219 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# =============================================================================
+# setup-git-workflow (chezmoi template)
+# - Configure en LOCAL (repo courant):
+#   - 2 remotes (perso + work)
+#   - workflow main/work-local
+#   - alias git sync-work-all
+#   - hook post-checkout pour switch d'identité
+#
+# Hypothèses:
+# - origin existe et pointe vers le repo perso (ex: .../dotfiles.git)
+# - le repo work a le même groupe/namespace, mais peut avoir un nom différent
+#   (par défaut: chezmoi.git)
+# =============================================================================
+
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+  echo "❌ Pas dans un repo git"
+  exit 1
+}
+
+# =========================
+# Secrets / pass via chezmoi
+# =========================
+PERSONAL_NAME={{ (pass "chezmoi/personal/git_user_name") | quote }}
+PERSONAL_EMAIL={{ (pass "chezmoi/personal/git_user_email") | quote }}
+WORK_NAME={{ (pass "chezmoi/work/git_user_name") | quote }}
+WORK_EMAIL={{ (pass "chezmoi/work/git_user_email") | quote }}
+WORK_GITLAB_HOST={{ (pass "chezmoi/work/gitlab_host_1") | quote }}
+
+# =========================
+# Paramètres (override via env)
+# =========================
+: "${PERSONAL_BRANCH:=main}"
+: "${WORK_BRANCH:=work-local}"
+
+: "${PERSONAL_REMOTE:=github}"          # remote perso local
+: "${WORK_REMOTE:=work}"                # remote work local
+
+: "${PERSONAL_REMOTE_BRANCH:=main}"
+: "${WORK_REMOTE_BRANCH:=main}"
+
+: "${WORK_REPO_NAME:=chezmoi}"          # IMPORTANT: chez toi, work repo = chezmoi.git
+
+# =========================
+# Helpers
+# =========================
+normalize_host() {
+  local h="$1"
+  h="${h#ssh://}"
+  h="${h#https://}"
+  h="${h#http://}"
+  h="${h%/}"
+  echo "$h"
+}
+
+extract_repo_path_from_url() {
+  # Retourne owner[/subgroup]/repo.git depuis:
+  # - git@host:owner/repo.git
+  # - ssh://git@host/owner/repo.git
+  # - https://host/owner/repo.git
+  local url="$1"
+  local path=""
+  if [[ "$url" =~ ^git@[^:]+:(.+)$ ]]; then
+    path="${BASH_REMATCH[1]}"
+  elif [[ "$url" =~ ^ssh://git@[^/]+/(.+)$ ]]; then
+    path="${BASH_REMATCH[1]}"
+  elif [[ "$url" =~ ^https?://[^/]+/(.+)$ ]]; then
+    path="${BASH_REMATCH[1]}"
+  else
+    return 1
+  fi
+  echo "$path"
+}
+
+set_remote_url() {
+  local name="$1"
+  local url="$2"
+  if git remote get-url "$name" >/dev/null 2>&1; then
+    git remote set-url "$name" "$url"
+  else
+    git remote add "$name" "$url"
+  fi
+}
+
+# =========================
+# 1) URL perso depuis origin
+# =========================
+if ! git remote get-url origin >/dev/null 2>&1; then
+  echo "❌ Remote 'origin' introuvable."
+  echo "   Ajoute origin d'abord, puis relance setup-git-workflow."
+  exit 1
+fi
+
+ORIGIN_URL="$(git remote get-url origin)"
+REPO_PATH="$(extract_repo_path_from_url "$ORIGIN_URL")" || {
+  echo "❌ Impossible d'extraire owner/repo depuis origin: $ORIGIN_URL"
+  exit 1
+}
+
+# ex:
+# REPO_PATH=maestro-bene/dotfiles.git
+# REPO_DIR=maestro-bene
+# REPO_FILE=dotfiles.git
+REPO_DIR="$(dirname "$REPO_PATH")"
+REPO_FILE="$(basename "$REPO_PATH")"
+REPO_BASE="${REPO_FILE%.git}"
+
+if [[ -z "$REPO_DIR" || "$REPO_DIR" == "." ]]; then
+  echo "❌ Namespace invalide extrait depuis origin: $REPO_PATH"
+  exit 1
+fi
+
+PERSONAL_REMOTE_URL="$ORIGIN_URL"
+
+WORK_HOST="$(normalize_host "$WORK_GITLAB_HOST")"
+WORK_REPO_FILE="${WORK_REPO_NAME}.git"
+WORK_REMOTE_URL="git@${WORK_HOST}:${REPO_DIR}/${WORK_REPO_FILE}"
+
+# =========================
+# 2) Configure remotes
+# =========================
+set_remote_url "$PERSONAL_REMOTE" "$PERSONAL_REMOTE_URL"
+set_remote_url "$WORK_REMOTE" "$WORK_REMOTE_URL"
+
+# =========================
+# 3) Stocke workflow local
+# =========================
+git config --local workflow.personal.branch "$PERSONAL_BRANCH"
+git config --local workflow.work.branch "$WORK_BRANCH"
+git config --local workflow.personal.remote "$PERSONAL_REMOTE"
+git config --local workflow.personal.remoteBranch "$PERSONAL_REMOTE_BRANCH"
+git config --local workflow.work.remote "$WORK_REMOTE"
+git config --local workflow.work.remoteBranch "$WORK_REMOTE_BRANCH"
+
+# Upstream si branches locales existent
+if git show-ref --verify --quiet "refs/heads/$PERSONAL_BRANCH"; then
+  git branch --set-upstream-to="$PERSONAL_REMOTE/$PERSONAL_REMOTE_BRANCH" "$PERSONAL_BRANCH" || true
+fi
+if git show-ref --verify --quiet "refs/heads/$WORK_BRANCH"; then
+  git branch --set-upstream-to="$WORK_REMOTE/$WORK_REMOTE_BRANCH" "$WORK_BRANCH" || true
+fi
+
+# =========================
+# 4) Alias sync (main -> work-local)
+# =========================
+git config --local alias.sync-work-all '!f(){ \
+  set -e; \
+  PB=$(git config --local --get workflow.personal.branch || echo main); \
+  WB=$(git config --local --get workflow.work.branch || echo work-local); \
+  WR=$(git config --local --get workflow.work.remote || echo work); \
+  WRB=$(git config --local --get workflow.work.remoteBranch || echo main); \
+  \
+  git switch "$WB"; \
+  COMMITS=$(git cherry "$WB" "$PB" | awk "/^\\+/ {print \\$2}"); \
+  [ -z "$COMMITS" ] && echo "Rien à sync ($PB -> $WB)" && git switch "$PB" && exit 0; \
+  \
+  for c in $COMMITS; do \
+    git cherry-pick -x "$c"; \
+    git commit --amend --no-edit --reset-author; \
+  done; \
+  \
+  git push "$WR" HEAD:"$WRB"; \
+  git switch "$PB"; \
+}; f'
+
+# =========================
+# 5) Hook identité par branche
+# =========================
+mkdir -p .git/hooks
+cat > .git/hooks/post-checkout <<HOOK
+#!/usr/bin/env bash
+set -euo pipefail
+
+branch="\$(git branch --show-current)"
+work_branch="\$(git config --local --get workflow.work.branch || echo work-local)"
+
+PERSONAL_NAME=${PERSONAL_NAME}
+PERSONAL_EMAIL=${PERSONAL_EMAIL}
+WORK_NAME=${WORK_NAME}
+WORK_EMAIL=${WORK_EMAIL}
+
+if [ "\$branch" = "\$work_branch" ]; then
+  git config --local user.name "\$WORK_NAME"
+  git config --local user.email "\$WORK_EMAIL"
+  echo "[identity] \$branch -> \$WORK_NAME <\$WORK_EMAIL>"
+else
+  git config --local user.name "\$PERSONAL_NAME"
+  git config --local user.email "\$PERSONAL_EMAIL"
+  echo "[identity] \$branch -> \$PERSONAL_NAME <\$PERSONAL_EMAIL>"
+fi
+HOOK
+
+chmod +x .git/hooks/post-checkout
+
+# Applique l'identité immédiatement
+.git/hooks/post-checkout
+
+cat <<EOF
+✅ Setup terminé (local au repo)
+
+Origin détecté:
+  $ORIGIN_URL
+Path détecté:
+  $REPO_PATH (repo perso: ${REPO_BASE}.git)
+
+Remotes configurés:
+  $PERSONAL_REMOTE -> $(git remote get-url "$PERSONAL_REMOTE")
+  $WORK_REMOTE     -> $(git remote get-url "$WORK_REMOTE")
+
+Workflow:
+  $PERSONAL_BRANCH -> $PERSONAL_REMOTE/$PERSONAL_REMOTE_BRANCH
+  $WORK_BRANCH     -> $WORK_REMOTE/$WORK_REMOTE_BRANCH
+
+Alias:
+  git sync-work-all
+EOF
+
