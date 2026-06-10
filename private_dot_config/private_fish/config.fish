@@ -88,7 +88,15 @@ end
 # FZF
 if command -v fzf >/dev/null
     if command -v fd >/dev/null
-        set -Ux FZF_DEFAULT_COMMAND "fd -H -E '.git'"
+        set -Ux FZF_DEFAULT_COMMAND "fd -H -E '.git' --color=always"
+        set -Ux FZF_DEFAULT_OPTS "\
+            --color=spinner:#F5E0DC,hl:#F38BA8 \
+            --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
+            --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
+            --color=selected-bg:#45475A \
+            --color=border:#6C7086,label:#CDD6F4"
+        set -g FZF_CTRL_T_COMMAND "command find -L \$dir -type f 2> /dev/null | sed '1d; s#^\./##'"
+        fzf --fish | source
         log "✅ FZF configuré avec fd"
     else
         log "✅ FZF configuré (fd recommandé pour de meilleures performances)"
@@ -103,6 +111,11 @@ else
     else
         log "💡 Installer avec votre gestionnaire de paquets ou : git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install"
     end
+end
+
+# Vivid
+if command -v vivid >/dev/null
+    set -Ux LS_COLORS $(vivid generate catppuccin-mocha)
 end
 
 # =========================
@@ -197,10 +210,10 @@ end
 # =========================
 
 # Fish shell configuration
-set -U fish_greeting ""  # disable fish greeting
-set -U fish_key_bindings fish_vi_key_bindings
-set -U fish_cursor_default block
-set -U fish_cursor_insert line
+set -g fish_greeting ""  # disable fish greeting
+set -g fish_key_bindings fish_vi_key_bindings
+set -g fish_cursor_default block
+set -g fish_cursor_insert line
 set -Ux BROWSER firefox
 
 source ~/.config/fish/conf.d/abbr.fish
@@ -228,6 +241,8 @@ end
 set -x NO_PROXY "localhost,127.0.0.1,::1"
 set -x no_proxy "localhost,127.0.0.1,::1"
 set -Ux LAZYGIT_NEW_DIR_FILE $HOME/.lazygit/newdir
+
+fish_config theme choose catppuccin-mocha --color-theme=dark
 
 # =========================
 # Service Management

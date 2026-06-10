@@ -1,9 +1,9 @@
 # ~/.bashrc
 
-if [ -f ~/.bashrc_minimal ]; then
-    source ~/.bashrc_minimal
-fi
+[ -f "$HOME/.bashrc_minimal" ] && . "$HOME/.bashrc_minimal"
 
-if [ -f ~/.bashrc_wsl ]; then
-    source ~/.bashrc_wsl
-fi
+case $- in
+*i*) [ -f "$HOME/.bashrc_interactive" ] && . "$HOME/.bashrc_interactive" ;;
+esac
+
+[ -f "$HOME/.bashrc_wsl" ] && . "$HOME/.bashrc_wsl"
