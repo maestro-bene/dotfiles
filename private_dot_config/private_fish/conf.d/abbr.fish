@@ -13,6 +13,8 @@ abbr acv "nvim ~/.tool-versions"
 abbr bi "brew install"
 abbr bu "brew uninstall"
 
+abbr c "clear"
+
 abbr cm "chezmoi cd"
 
 abbr dc "docker compose"
@@ -21,6 +23,8 @@ abbr dcd "docker compose down -v"
 abbr dcr "docker compose restart"
 abbr dps "docker ps --format 'table {{.Names}}\t{{.Status}}'"
 abbr dsp "docker system prune"
+
+abbr e "exit"
 
 abbr fi "fisher install"
 abbr fr "fisher refresh"

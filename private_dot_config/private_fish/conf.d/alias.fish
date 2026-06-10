@@ -1,7 +1,3 @@
-alias c='clear'
-
-alias e='exit'
-
 #alias clangd='clangd --query-driver=/opt/homebrew/Cellar/open-mpi/4.1.6/bin/mpic++'
 
 #alias loaddb="gupdatedb --localpaths=$HOME --prunepaths=/Volumes --output=$HOME/locatedb"
