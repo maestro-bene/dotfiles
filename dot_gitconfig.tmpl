@@ -21,6 +21,17 @@
 [init]
     defaultBranch = main
 
+[core]
+	pager = delta
+
+[delta]
+    features = side-by-side line-numbers decorations
+    navigate = true
+    light = false
+
+[interactive]
+	diffFilter = delta --color-only
+
 [credential]
     helper = store
 

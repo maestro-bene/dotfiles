@@ -74,7 +74,7 @@ end
 # Bat
 if command -v bat >/dev/null
     set -Ux BAT_THEME "Catppuccin Mocha"
-    set -Ux MANPAGER "sh -c 'col -bx | bat -l man -p'"
+    set -Ux MANPAGER "bat -plman"
     log "✅ Bat configuré avec thème Catppuccin Mocha"
 else
     log "❌ Bat non trouvé"
@@ -124,36 +124,22 @@ end
 # ASDF
 # =========================
 
-set -l asdf_configured false
-
-if test -n "$brew_cmd" -a -f "$HOMEBREW_PATH/opt/asdf/libexec/asdf.fish"
-    source $HOMEBREW_PATH/opt/asdf/libexec/asdf.fish
-    fish_add_path -mp $HOMEBREW_PATH/opt/asdf/libexec/bin
-    set asdf_configured true
-    log "✅ asdf configuré via Homebrew"
-else if test -f ~/.asdf/asdf.fish
-    source ~/.asdf/asdf.fish
-    set asdf_configured true
-    log "✅ asdf configuré (installation directe)"
-end
-
-if test $asdf_configured = true
-    set -x ASDF_ALWAYS_KEEP_DOWNLOAD false
-    
-    set -l asdf_shims_dir (test -n "$ASDF_DATA_DIR"; and echo "$ASDF_DATA_DIR/shims"; or echo "$HOME/.asdf/shims")
-    test -d $asdf_shims_dir; and fish_add_path -mp $asdf_shims_dir
-    
-    if not test -f ~/.config/fish/completions/asdf.fish
-        asdf completion fish > ~/.config/fish/completions/asdf.fish 2>/dev/null
-        log "✅ Complétion asdf générée"
-    end
-else
-    log "❌ asdf non trouvé"
-    if test -n "$brew_cmd"
-        log "💡 Installer avec : brew install asdf"
+if test -n "$brew_cmd" -a -f "$HOMEBREW_PATH/opt/asdf/bin/asdf"
+    if test -z $ASDF_DATA_DIR
+        set _asdf_shims "$HOME/.asdf/shims"
     else
-        log "💡 Installer avec : git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0"
+        set _asdf_shims "$ASDF_DATA_DIR/shims"
     end
+
+    # Do not use fish_add_path (added in Fish 3.2) because it
+    # potentially changes the order of items in PATH
+    if not contains $_asdf_shims $PATH
+        set -gx --prepend PATH $_asdf_shims
+    end
+    set --erase _asdf_shims
+
+    asdf completion fish > ~/.config/fish/completions/asdf.fish
+    log "✅ asdf configuré via Homebrew"
 end
 
 # Language specific (conditional)
@@ -245,28 +231,6 @@ set -x no_proxy "localhost,127.0.0.1,::1"
 set -Ux LAZYGIT_NEW_DIR_FILE $HOME/.lazygit/newdir
 
 fish_config theme choose catppuccin-mocha --color-theme=dark
-
-# =========================
-# Service Management
-# =========================
-
-function start_service_if_needed
-    set service_name $argv[1]
-    if pgrep -f $service_name > /dev/null
-        log "ℹ️ Service: $service_name is already running."
-    else
-        log "ℹ️ Starting $service_name..."
-        log_function sudo service $service_name start
-    end
-end
-
-# List of services to ensure are running
-# set -l services wsl-vpnkit cntlm
-set -l services docker
-
-for service in $services
-    start_service_if_needed $service
-end
 
 # =========================
 # SSH Agent

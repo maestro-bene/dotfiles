@@ -11,3 +11,5 @@ alias ivm "vim"
 
 alias dotfiles='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
 alias avante='nvim -c "lua vim.defer_fn(function()require(\"avante.api\").zen_mode()end, 100)"'
+
+alias docker='podman'
