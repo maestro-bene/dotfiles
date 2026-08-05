@@ -155,9 +155,10 @@ end
 # =========================
 
 if command -v nvim >/dev/null
-    set -Ux EDITOR nvim
-    set -Ux GIT_EDITOR nvim
-    set -Ux VISUAL nvim
+    set -Ux EDITOR $HOMEBREW_PATH/bin/nvim
+    set -Ux SUDO_EDITOR $HOMEBREW_PATH/bin/nvim
+    set -Ux GIT_EDITOR $HOMEBREW_PATH/bin/nvim
+    set -Ux VISUAL $HOMEBREW_PATH/bin/nvim
     log "✅ Neovim configuré comme éditeur par défaut"
     
     set -l mason_bin "$HOME/.local/share/nvim/mason/bin"
