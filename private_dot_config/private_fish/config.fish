@@ -146,6 +146,7 @@ end
 if command -v go >/dev/null
     set -Ux GOPATH (go env GOPATH)
     set -Ux GOBIN $GOPATH/bin
+    fish_add_path GOBIN
     log "✅ GOPATH configuré"
     fish_add_path $GOBIN
 end
@@ -204,6 +205,7 @@ set -g fish_key_bindings fish_vi_key_bindings
 set -g fish_cursor_default block
 set -g fish_cursor_insert line
 set -Ux BROWSER firefox
+set -gx XDG_RUNTIME_DIR /mnt/wslg/runtime-dir
 
 source ~/.config/fish/conf.d/abbr.fish
 source ~/.config/fish/conf.d/alias.fish
