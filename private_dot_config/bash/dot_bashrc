@@ -18,3 +18,43 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 
 # Temp dir
 export TMPDIR="$HOME/.tmp/"
+
+# Complétion bash pour generate_logs.sh
+# Gère : options -n/-h, exclusion des fichiers déjà tapés,
+# et suffixe ":N" (compteur de répétition par fichier).
+
+_log_completion() {
+    local cur prev files selected_files files_to_complete
+    local LOG_DIR="$HOME/automation/logs"
+
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Après -n, on attend un nombre : pas de complétion de fichiers
+    if [[ "$prev" == "-n" ]]; then
+        COMPREPLY=()
+        return 0
+    fi
+
+    # Proposer les options si l'utilisateur tape un tiret
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "-n -h" -- "$cur") )
+        return 0
+    fi
+
+    if [ -d "$LOG_DIR" ]; then
+        # Liste des fichiers disponibles (chemin relatif, sans extension)
+        files=$(find "$LOG_DIR" -type f -name '*.log' | sed "s|^$LOG_DIR/||; s/\.log$//")
+
+        # Fichiers déjà tapés sur la ligne de commande, en retirant
+        # un éventuel suffixe ":N" et en ignorant les options
+        selected_files=("${COMP_WORDS[@]:1}")
+        selected_files=$(printf "%s\n" "${selected_files[@]}" | sed 's/:[0-9]*$//' | grep -v '^-')
+
+        files_to_complete=$(comm -23 <(echo "$files" | sort) <(echo "$selected_files" | sort))
+        COMPREPLY=( $(compgen -W "$files_to_complete" -- "$cur") )
+    fi
+}
+
+complete -F _log_completion generate_logs.sh
+
