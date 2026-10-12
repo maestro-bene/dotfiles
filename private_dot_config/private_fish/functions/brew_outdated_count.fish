@@ -31,7 +31,7 @@ function brew_outdated_count --description 'Return number of outdated Homebrew f
 
     # Recalcule et met à jour le cache
     # --quiet pour limiter la sortie; --greedy pour inclure les casks (retire-le si tu veux seulement formulae)
-    set -l count (brew outdated --greedy --quiet ^/dev/null | count)
+    set -l count (brew outdated --greedy --quiet | count)
     echo $count > $cache_file
     echo $now > $stamp_file
     echo $count

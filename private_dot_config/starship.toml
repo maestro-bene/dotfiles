@@ -5,7 +5,7 @@ palette = "catppuccin_mocha"
 
 # custom format
 format = """
-[╭─ $shell────$custom_brew────────$memory_usage──╌╌ $git_branch$git_metrics$git_commit$aws$buf$bun$c$cmake$conda$crystal$dart$deno$docker_context$elixir$elm$fennel$fortran$fossil_branch$gcloud$golang$gradle$guix_shell$haskell$haxe$hg_branch$java$julia$kotlin$lua$meson$nim$nix_shell$nodejs$ocaml$package$perl$php$pijul_channel$pixi$python$rlang$ruby$rust$scala$swift$xmake$zig$cmd_duration](overlay0)
+[╭─ $shell────${custom.brew}────────$memory_usage──╌╌ $git_branch$git_metrics$git_commit$aws$buf$bun$c$cmake$conda$crystal$dart$deno$docker_context$elixir$elm$fennel$fortran$fossil_branch$gcloud$golang$gradle$guix_shell$haskell$haxe$hg_branch$java$julia$kotlin$lua$meson$nim$nix_shell$nodejs$ocaml$package$perl$php$pijul_channel$pixi$python$rlang$ruby$rust$scala$swift$xmake$zig$cmd_duration](overlay0)
 [├─](overlay0)$sudo$username$hostname $directory$read_only
 [╰─ $os$character](overlay0)"""
 
@@ -85,9 +85,9 @@ format = ' [$symbol $ram_pct]($style) '
 style = 'peach'
 
 [custom.brew]
-command = "fish -c 'brew_outdated_count 3600'"
+command = "brew_outdated_count"
 when = "command -v brew >/dev/null 2>&1"
-shell = ["sh", "-c"]  # laisse Starship lancer fish via sh -c
+shell = ["fish"]  # laisse Starship lancer fish via sh -c
 format = "[$symbol$output]($style) "
 symbol = "🍺 "
 style = "peach"
@@ -194,4 +194,3 @@ Unknown = " "
 Void = " "
 Windows = "󰍲 "
 Zorin = " "
-
