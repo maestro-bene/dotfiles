@@ -85,12 +85,13 @@ format = ' [$symbol $ram_pct]($style) '
 style = 'peach'
 
 [custom.brew]
-command = "brew_outdated_count"
-when = "command -v brew >/dev/null 2>&1"
-shell = ["fish"]  # laisse Starship lancer fish via sh -c
+command = "cat ~/.cache/fish/brew_outdated_count.txt"
+when = "test -f ~/.cache/fish/brew_outdated_count.txt"
+shell = ["fish"]
 format = "[$symbol$output]($style) "
 symbol = "🍺 "
 style = "peach"
+ignore_timeout = true
 
 [localip]
 ssh_only = false

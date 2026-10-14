@@ -31,6 +31,27 @@ else
     log "💡 Installer avec : /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
 end
 
+function update_brew_cache_async
+    set -l cache_dir ~/.cache/fish
+    set -l stamp_file $cache_dir/brew_outdated_stamp.txt
+    set -l ttl 120
+    set -l now (date +%s)
+    set -l last 0
+
+    if test -f $stamp_file
+        set last (cat $stamp_file)
+    end
+
+    if test (math $now - $last) -ge $ttl
+        begin
+            brew outdated --greedy --quiet | count > $cache_dir/brew_outdated_count.txt
+            date +%s > $stamp_file
+        end &
+    end
+end
+
+update_brew_cache_async
+
 # =========================
 # Utils Detection & Setup
 # =========================
