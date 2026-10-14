@@ -87,7 +87,7 @@ style = 'peach'
 [custom.brew]
 command = "cat ~/.cache/fish/brew_outdated_count.txt"
 when = "test -f ~/.cache/fish/brew_outdated_count.txt"
-shell = ["fish"]
+shell = ["fish", "--no-config"]
 format = "[$symbol$output]($style) "
 symbol = "🍺 "
 style = "peach"
