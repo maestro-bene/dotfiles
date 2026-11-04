@@ -5,7 +5,7 @@ palette = "catppuccin_mocha"
 
 # custom format
 format = """
-[╭─ $shell────${custom.brew}────────$memory_usage──╌╌ $git_branch$git_metrics$git_commit$aws$buf$bun$c$cmake$conda$crystal$dart$deno$docker_context$elixir$elm$fennel$fortran$fossil_branch$gcloud$golang$gradle$guix_shell$haskell$haxe$hg_branch$java$julia$kotlin$lua$meson$nim$nix_shell$nodejs$ocaml$package$perl$php$pijul_channel$pixi$python$rlang$ruby$rust$scala$swift$xmake$zig$cmd_duration](overlay0)
+[╭─ $shell───${custom.apt}──${custom.brew}────────$memory_usage──╌╌ $git_branch$git_metrics$git_commit$aws$buf$bun$c$cmake$conda$crystal$dart$deno$docker_context$elixir$elm$fennel$fortran$fossil_branch$gcloud$golang$gradle$guix_shell$haskell$haxe$hg_branch$java$julia$kotlin$lua$meson$nim$nix_shell$nodejs$ocaml$package$perl$php$pijul_channel$pixi$python$rlang$ruby$rust$scala$swift$xmake$zig$cmd_duration](overlay0)
 [├─](overlay0)$sudo$username$hostname $directory$read_only
 [╰─ $os$character](overlay0)"""
 
@@ -86,11 +86,20 @@ style = 'peach'
 
 [custom.brew]
 command = "cat ~/.cache/fish/brew_outdated_count.txt"
-when = "test -f ~/.cache/fish/brew_outdated_count.txt"
+when = "test -s ~/.cache/fish/brew_outdated_count.txt; and test (cat ~/.cache/fish/brew_outdated_count.txt) -gt 0"
 shell = ["fish", "--no-config"]
 format = "[$symbol$output]($style) "
 symbol = "🍺 "
 style = "peach"
+ignore_timeout = true
+
+[custom.apt]
+command = "cat ~/.cache/fish/apt_upgradable_count.txt"
+when = "test -s ~/.cache/fish/apt_upgradable_count.txt; and test (cat ~/.cache/fish/apt_upgradable_count.txt) -gt 0"
+shell = ["fish", "--no-config"]
+format = "[$symbol$output]($style) "
+symbol = "🔺"
+style = "red"
 ignore_timeout = true
 
 [localip]

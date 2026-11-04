@@ -31,10 +31,15 @@ else
     log "💡 Installer avec : /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
 end
 
-function update_brew_cache_async
+# =========================
+# Brew Upgradable Count (async, no sudo, no network)
+# =========================
+
+function update_brew_cache_async  --description 'Met à jour le cache brew outdated en arrière-plan, sans sortie terminal'
     set -l cache_dir ~/.cache/fish
     set -l stamp_file $cache_dir/brew_outdated_stamp.txt
-    set -l ttl 120
+    set -l log_file $cache_dir/brew_outdated_async.log
+    set -l ttl 20
     set -l now (date +%s)
     set -l last 0
 
@@ -44,13 +49,52 @@ function update_brew_cache_async
 
     if test (math $now - $last) -ge $ttl
         begin
-            brew outdated --greedy --quiet | count > $cache_dir/brew_outdated_count.txt
+            set -lx HOMEBREW_NO_AUTO_UPDATE 1
+            brew outdated --greedy --quiet >$cache_dir/brew_outdated_count.tmp 2>$log_file
+            count <$cache_dir/brew_outdated_count.tmp >$cache_dir/brew_outdated_count.txt
+            rm -f $cache_dir/brew_outdated_count.tmp
             date +%s > $stamp_file
         end &
+        disown 2>/dev/null
     end
 end
 
 update_brew_cache_async
+
+# =========================
+# APT Upgradable Count (async, no sudo, no network)
+# =========================
+#
+function update_apt_cache_async --description 'Compte les paquets apt upgradables en arrière-plan, lecture seule, sans sudo ni réseau'
+    if not command -v apt >/dev/null
+        return
+    end
+
+    set -l cache_dir ~/.cache/fish
+    set -l stamp_file $cache_dir/apt_upgradable_stamp.txt
+    set -l log_file $cache_dir/apt_upgradable_async.log
+    set -l ttl 20
+    set -l now (date +%s)
+    set -l last 0
+
+    mkdir -p $cache_dir
+
+    if test -f $stamp_file
+        set last (cat $stamp_file)
+    end
+
+    if test (math $now - $last) -ge $ttl
+        begin
+            apt list --upgradable 2>$log_file \
+                | grep -c '\[upgradable from:' \
+                > $cache_dir/apt_upgradable_count.txt
+            date +%s >$stamp_file
+        end &
+        disown 2>/dev/null
+    end
+end
+
+update_apt_cache_async
 
 # =========================
 # Utils Detection & Setup

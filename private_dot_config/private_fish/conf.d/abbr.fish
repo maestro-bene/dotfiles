@@ -92,6 +92,7 @@ abbr wgh    "wget --spider https://www.github.com"
 
 abbr ze "chezmoi edit"
 abbr fishc "chezmoi edit ~/.config/fish/; chezmoi apply; source ~/.config/fish/config.fish"
+abbr rfishc "nvim ~/.config/fish/"
 abbr sshc "chezmoi edit ~/.ssh/config"
 abbr rsshc "cd ~/.ssh && vim ~/.ssh/config.d"
 abbr config "chezmoi edit ~/.config"
