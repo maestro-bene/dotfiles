@@ -1,17 +1,21 @@
-function log_function
-    if test "$LOG" = "Log"
-        # Run command normally
-        if functions -q $argv[1]
-            eval $argv
-        else 
-            command $argv
-        end
+function log_function --description 'Run a command, hiding stdout unless debugging'
+    if not set -q argv[1]
+        printf '%s\n' 'log_function: missing command' >&2
+        return 2
+    end
+
+    if test -z "$argv[1]"
+        printf '%s\n' 'log_function: empty command' >&2
+        return 2
+    end
+
+    if test "$LOG" = Log
+        $argv
+        return $status
     else
-        # Run command with output suppressed
-        if functions -q $argv[1]
-            eval $argv > /dev/null 2>&1
-        else 
-            command $argv > /dev/null 2>&1
-        end
+        # Keep stderr visible even when stdout is suppressed.
+        $argv >/dev/null
+        return $status
     end
 end
+

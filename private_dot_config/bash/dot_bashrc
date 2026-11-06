@@ -10,6 +10,8 @@ HISTFILESIZE=2000
 shopt -s checkwinsize
 shopt -s globstar
 
+eval "$(starship init bash)"
+
 # lesspipe (safe)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 

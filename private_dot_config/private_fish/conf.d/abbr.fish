@@ -1,14 +1,10 @@
 # NOTE: manage fish abbreviations
 # https://fishshell.com/docs/current/cmds/abbr.html
 
-abbr ar "asdf reshim"
-abbr als "asdf list"
-abbr ai "asdf install"
-abbr apu "asdf plugin update --all"
-abbr apl "asdf plugin list"
-abbr apa "asdf plugin add"
-abbr apr "asdf plugin remove"
-abbr acv "nvim ~/.tool-versions"
+abbr ml 'mise ls'
+abbr mi 'mise install'
+abbr mu 'mise use'
+abbr mx 'mise exec --'
 
 abbr bi "brew install"
 abbr bu "brew uninstall"
@@ -83,10 +79,22 @@ abbr tr "tldr --list | fzf --header 'tldr (tealdeer)' --reverse --preview 'tldr 
 abbr tls "tmux list-sessions"
 abbr tlw "tmux list-windows"
 abbr tn "tmux new -s (basename (pwd))"
+
 #abbr tt "touch t && chmod +x t && echo -e '#!/usr/bin/env bash\n' > t && nvim t"
 
 abbr x      "chmod +x (ls | fzf --header='chmod +x')"
 abbr nx     "chmod -x (ls | fzf --header='chmod -x')"
+
+abbr wm "workmux"
+abbr wml "workmux list"
+abbr wmd "workmux dashboard"
+abbr wmp "workmux path"
+abbr wma "workmux add"
+abbr wmo "workmux open"
+abbr wmi "workmux init"
+abbr wmce "workmux config edit"
+abbr wmm "workmux merge"
+abbr wmr "workmux remove"
 
 abbr wgh    "wget --spider https://www.github.com"
 
