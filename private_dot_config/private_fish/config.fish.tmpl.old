@@ -225,6 +225,7 @@ if status is-interactive
     # --- 62. SSH / Keychain ---
     # Preserve the existing agent and required-key validation.
 
+{{- if eq .profile "work" }}
     if command -q keychain
         if __ssh_required_keys_loaded
             log "✅ SSH agent ready: both required keys loaded"
@@ -242,6 +243,17 @@ if status is-interactive
     else
         log "⚠️ Keychain not found"
     end
+{{- else }}
+    # YubiKey GPG/SSH pour fish
+    set -gx SSH_AUTH_SOCK (gpgconf --list-dirs agent-ssh-socket | string trim)
+    set -gx GPG_TTY (tty)
+    gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+
+    # Auto-reload GPG agent à chaque nouveau terminal
+    function __gpg_reloader --on-variable PWD --description 'Reload gpg agent on PWD change'
+      gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+    end
+{{- end}}
 
     # --- 63. Zoxide ---
 
