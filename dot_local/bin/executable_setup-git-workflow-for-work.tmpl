@@ -25,9 +25,11 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
 # =========================
 PERSONAL_NAME={{ (pass "chezmoi/personal/git_user_name") | quote }}
 PERSONAL_EMAIL={{ (pass "chezmoi/personal/git_user_email") | quote }}
+{{- if eq .profile "work" }}
 WORK_NAME={{ (pass "chezmoi/work/git_user_name") | quote }}
 WORK_EMAIL={{ (pass "chezmoi/work/git_user_email") | quote }}
 WORK_GITLAB_HOST={{ (pass "chezmoi/work/gitlab_host_1") | quote }}
+{{end}}
 
 # =========================
 # Paramètres (override via env)
