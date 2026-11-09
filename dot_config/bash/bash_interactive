@@ -1,0 +1,46 @@
+# Settings and integrations for interactive Bash shells only.
+
+# Prompt integration.
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init bash)"
+fi
+
+# Bash completion, when installed by the OS.
+if ! shopt -oq posix; then
+    if [ -r /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -r /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
+
+# Completion for generate_logs.sh.
+_log_completion() {
+    local cur prev files selected_files files_to_complete
+    local LOG_DIR="$HOME/automation/logs"
+
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ "$prev" == "-n" ]]; then
+        COMPREPLY=()
+        return 0
+    fi
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "-n -h" -- "$cur") )
+        return 0
+    fi
+
+    if [ -d "$LOG_DIR" ]; then
+        files=$(find "$LOG_DIR" -type f -name '*.log' | sed "s|^$LOG_DIR/||; s/\.log$//")
+        selected_files=("${COMP_WORDS[@]:1}")
+        selected_files=$(printf "%s\n" "${selected_files[@]}" | sed 's/:[0-9]*$//' | grep -v '^-')
+        files_to_complete=$(comm -23 <(echo "$files" | sort) <(echo "$selected_files" | sort))
+        COMPREPLY=( $(compgen -W "$files_to_complete" -- "$cur") )
+    fi
+}
+
+if command -v find >/dev/null 2>&1 && command -v sed >/dev/null 2>&1 && command -v grep >/dev/null 2>&1; then
+    complete -F _log_completion generate_logs.sh
+fi

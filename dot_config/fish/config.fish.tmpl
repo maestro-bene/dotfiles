@@ -1,0 +1,380 @@
+# ███████╗██╗███████╗██╗  ██╗
+# ██╔════╝██║██╔════╝██║  ██║
+# █████╗  ██║███████╗███████║
+# ██╔══╝  ██║╚════██║██╔══██║
+# ██║     ██║███████║██║  ██║
+# ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝
+
+# Structure:
+#   00 — Logging
+#   10 — Shared shell and OS environment
+#   20 — Static PATH and Homebrew discovery
+#   30 — Development runtimes and editor defaults
+#   40 — Optional shared CLI settings (bat, vivid, fzf)
+#   50 — User secrets
+#   60 — Interactive integrations (profile/backend-aware)
+#   90 — Opt-in diagnostics (LOG=Log)
+#
+# The shared Brewfile in ~/.local/share/install-dotfiles is the inventory baseline.
+# Profile and backend-specific manifests add tools only when selected; integrations
+# remain optional and are skipped when their executable is unavailable.
+# Custom functions are maintained separately in functions/.
+# Mise activation is configured explicitly below and works with non-Homebrew installs.
+
+
+# --- 00. Logging ---
+
+if not set -q LOG
+    set -g LOG Silent
+end
+
+log "🔧 Loading config.fish"
+
+
+# --- 10. Shared environment ---
+
+if not set -q BROWSER
+    set -gx BROWSER firefox
+end
+
+set -gx LANG en_US.UTF-8
+set -gx LC_ALL en_US.UTF-8
+
+set -gx LAZYGIT_NEW_DIR_FILE "$HOME/.lazygit/newdir"
+
+# On WSLg, prefer its runtime directory only when it exists; otherwise preserve
+# the system-provided XDG_RUNTIME_DIR (or leave it unset).
+if string match -q '*microsoft*' -- (string lower (command uname -r))
+    if test -d /mnt/wslg/runtime-dir
+        set -gx XDG_RUNTIME_DIR /mnt/wslg/runtime-dir
+    end
+end
+
+# Optional proxy settings.
+# set -gx HTTP_PROXY http://localhost:3129
+# set -gx HTTPS_PROXY "$HTTP_PROXY"
+# set -gx http_proxy "$HTTP_PROXY"
+# set -gx https_proxy "$HTTPS_PROXY"
+
+set -gx NO_PROXY "localhost,127.0.0.1,::1"
+set -gx no_proxy "$NO_PROXY"
+
+
+# --- 20. Static PATH and Homebrew discovery ---
+
+# Homebrew is optional (the Brewfile is the shared package baseline); when
+# present, resolve its prefix and add its executable directories below.
+# Stable destinations for tools installed with "go install".
+set -gx GOPATH "$HOME/go"
+set -gx GOBIN "$HOME/go/bin"
+
+set -l brew_cmd (command -s brew)
+
+if test -n "$brew_cmd"
+    set -gx HOMEBREW_PATH (dirname (dirname "$brew_cmd"))
+    set -gx HOMEBREW_NO_ENV_HINTS 1
+    log "✅ Homebrew configured: $HOMEBREW_PATH"
+end
+
+# Static PATH priority, highest first:
+#   1. Go user-installed tools
+#   2. User scripts
+#   3. Neovim Mason tools
+#   4. Homebrew binaries
+#   5. Remaining inherited PATH
+#
+# Mise manages interpreter paths separately.
+# --path avoids storing these entries in universal fish_user_paths.
+
+set -l static_paths \
+    "$GOBIN" \
+    "$HOME/.local/bin" \
+    "$HOME/.local/share/nvim/mason/bin"
+
+if test -n "$brew_cmd"
+    set -a static_paths \
+        "$HOMEBREW_PATH/bin" \
+        "$HOMEBREW_PATH/sbin"
+end
+
+fish_add_path --path --move --prepend $static_paths
+
+log "✅ Static PATH configured"
+
+
+# --- 30. Development runtimes and editor defaults ---
+# Mise:
+# Homebrew auto-activation is disabled with the universal variable:
+#   set --universal --export MISE_FISH_AUTO_ACTIVATE 0
+#
+# Explicit interactive activation occurs in section 60,
+# after all static PATH modifications.
+
+if command -q mise
+    log "✅ Mise executable available"
+end
+
+# Go:
+# Do not derive GOPATH or GOBIN from the selected compiler.
+# Both are defined in section 20 before PATH construction.
+
+log "✅ Go destinations configured: GOPATH=$GOPATH, GOBIN=$GOBIN"
+
+# Neovim:
+# Resolve the editor after configuring the static PATH.
+
+set -l nvim_cmd (command -s nvim)
+
+if test -n "$nvim_cmd"
+    set -gx EDITOR "$nvim_cmd"
+    set -gx SUDO_EDITOR "$nvim_cmd"
+    set -gx GIT_EDITOR "$nvim_cmd"
+    set -gx VISUAL "$nvim_cmd"
+    log "✅ Neovim configured as default editor"
+end
+
+
+# --- 40. Optional shared CLI settings ---
+# Each block configures environment only when its corresponding executable is
+# available. FZF's fd/bat integrations are independently optional.
+
+# Bat: pager theme and manual-page rendering.
+
+if command -q bat
+    set -gx BAT_THEME "Catppuccin Mocha"
+    set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
+
+    log "✅ Bat configured"
+end
+
+# Vivid: LS_COLORS generation.
+
+if command -q vivid
+    set -gx LS_COLORS (command vivid generate catppuccin-mocha)
+
+    log "✅ Vivid colors configured"
+end
+
+# FZF: keep variables available to non-interactive commands; interactive key
+# bindings are initialized separately below.
+
+if command -q fzf
+    set -gx FZF_DEFAULT_OPTS "\
+        --color=spinner:#F5E0DC,hl:#F38BA8 \
+        --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
+        --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
+        --color=selected-bg:#45475A \
+        --color=border:#6C7086,label:#CDD6F4"
+
+    if command -q fd
+        set -gx FZF_DEFAULT_COMMAND \
+            "fd --type f -H -E '.git' --color=always"
+
+        set -gx FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+
+        if command -q bat
+            set -gx FZF_CTRL_T_OPTS \
+                "--ansi --min-height=30 --preview 'bat --style=numbers --color=always --line-range :300 {}' --preview-window=right,60%,border-left"
+        end
+    end
+
+    log "✅ FZF variables configured"
+end
+
+
+# --- 50. Secrets ---
+
+# Keep secrets available to non-interactive commands.
+# This file is sourced after defaults and can override them.
+
+if test -f "$HOME/.config/fish/secrets.fish"
+    source "$HOME/.config/fish/secrets.fish"
+    log "✅ secrets.fish loaded"
+end
+
+
+# --- 60. Interactive integrations ---
+
+if status is-interactive
+    log "🖥️ Initializing interactive shell"
+
+    # Load optional starship transient-prompt functions only with Starship.
+    if command -q starship
+        for prompt_function in starship_transient_prompt_func.fish starship_transient_rprompt_func.fish
+            set -l prompt_function_path "$__fish_config_dir/functions/$prompt_function"
+            if test -f "$prompt_function_path"
+                source "$prompt_function_path"
+            end
+        end
+    end
+
+    # Television (tv) provides its interactive Fish shell integration.
+    if command -q tv
+        command tv init fish | source
+        log "✅ tv integrated"
+    end
+
+    # --- Mise activation ---
+    # Must follow all static PATH modifications.
+
+    if command -q mise
+        command mise activate fish | source
+        log "✅ Mise activation loaded"
+    end
+
+    # --- 61. Interface ---
+
+    set -g fish_greeting ""
+
+    set -g fish_key_bindings fish_vi_key_bindings
+    set -g fish_cursor_default block
+    set -g fish_cursor_insert line
+
+    if type -q fish_config
+        fish_config theme choose catppuccin-mocha --color-theme=dark
+    end
+
+    log "✅ Fish interface configured"
+
+    # --- 62. SSH / Keychain ---
+    # Preserve the existing agent and required-key validation.
+
+{{- if eq .profile "work" }}
+    if command -q keychain
+        if __ssh_required_keys_loaded
+            log "✅ SSH agent ready: both required keys loaded"
+        else
+            log "🔄 Initializing SSH environment via keychain"
+
+            eval (command keychain --eval --quiet id_ed25519 id_rsa)
+
+            if __ssh_required_keys_loaded
+                log "✅ SSH environment ready after keychain"
+            else
+                log "⚠️ SSH agent unavailable or required keys missing"
+            end
+        end
+    else
+        log "⚠️ Keychain not found"
+    end
+{{- else }}
+    # Personal GPG/YubiKey integration is optional.
+    if command -q gpgconf; and command -q gpg-connect-agent
+        set -l gpg_socket (command gpgconf --list-dirs agent-ssh-socket 2>/dev/null | string trim)
+        if test -n "$gpg_socket"
+            set -gx SSH_AUTH_SOCK "$gpg_socket"
+            set -gx GPG_TTY (tty 2>/dev/null)
+            command gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+
+            function __gpg_reloader --on-variable PWD --description 'Reload gpg agent on PWD change'
+                command gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+            end
+        end
+    end
+
+{{- end }}
+{{- if eq .multiplexer "rex" }}
+    # Workrex is specific to the selected Rex backend; do not require it in
+    # tmux setups or diagnose it outside this backend.
+    if command -q workrex
+        command workrex completions fish | source
+    end
+{{- end }}
+
+    # --- 63. Zoxide ---
+
+    if command -q zoxide
+        command zoxide init fish | source
+        log "✅ Zoxide integration enabled"
+    end
+
+    # --- 64. FZF key bindings ---
+
+    if command -q fzf
+        command fzf --fish | source
+
+        # Optional bindings provided by the fzf.fish plugin.
+        if type -q fzf_configure_bindings
+            fzf_configure_bindings \
+                --directory=ctrl-f \
+                --variables=ctrl-alt-v
+        end
+
+        log "✅ FZF integration enabled"
+    end
+
+    # --- 65. Package counters ---
+    # These helpers are optional and self-skip when their package manager or
+    # locking support is absent; counters refresh asynchronously and quietly.
+
+    if command -q brew; and functions -q update_brew_cache_async
+        update_brew_cache_async
+    end
+    if command -q apt; and functions -q update_apt_cache_async
+        update_apt_cache_async
+    end
+
+    # --- 66. Starship ---
+    # Initialize the prompt after the other interactive integrations.
+
+    if command -q starship
+        set -gx STARSHIP_SHELL fish
+        command starship init fish | source
+        if functions -q enable_transience
+            enable_transience
+        end
+        log "✅ Starship configured"
+    end
+
+    # --- 67. Custom interactive scripts ---
+
+    # log_function ~/.config/bin/mount_sshfs
+end
+
+
+# --- 90. Opt-in diagnostics ---
+
+# External command resolution only. Missing optional integrations are reported
+# here rather than on every normal startup. Use "type -a COMMAND" to inspect
+# functions and aliases as well.
+
+if test "$LOG" = Log
+    log "📊 Optional Fish integrations — startup PATH snapshot:"
+
+    set -l optional_tools brew mise nvim bat vivid fzf fd zoxide starship tv lsd lazygit delta sesh
+{{- if eq .profile "work" }}
+    set -a optional_tools keychain
+{{- else }}
+    set -a optional_tools gpgconf gpg-connect-agent
+{{- end }}
+{{- if eq .multiplexer "tmux" }}
+    set -a optional_tools tmux workmux fzf-tmux
+{{- else }}
+    set -a optional_tools rex workrex
+{{- end }}
+
+    for tool in $optional_tools
+        set -l tool_path (command -s "$tool")
+        if test -n "$tool_path"
+            log "  ✅ $tool → $tool_path"
+        else
+            log "  ⚠️ optional integration unavailable: $tool"
+        end
+    end
+
+    if command -q brew; or command -q apt
+        if command -q flock
+            set -l flock_path (command -s flock)
+            log "  ✅ flock → $flock_path"
+        else
+            log "  ⚠️ package cache refresh skipped: flock is unavailable"
+        end
+    end
+
+    log "📂 Go installation destinations:"
+    log "  GOPATH=$GOPATH"
+    log "  GOBIN=$GOBIN"
+end
+
+log "🎯 Fish configuration loaded"
+

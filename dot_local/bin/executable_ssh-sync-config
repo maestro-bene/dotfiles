@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# OpenSSH LocalCommand invokes this on the client, regardless of whether ssh
+# was launched from Fish, Bash, or another shell. Only synchronize when the
+# effective remote account is exactly gcudennec.
+
+fail() {
+  printf 'ssh-sync-config: %s\n' "$*" >&2
+  exit 1
+}
+
+[[ $# -eq 3 ]] || fail 'usage: ssh-sync-config HOST PORT USER'
+host=$1
+port=$2
+remote_user=$3
+[[ "$remote_user" == gcudennec ]] || exit 0
+
+[[ -L "$HOME/.bashrc" && "$(readlink "$HOME/.bashrc")" == .config/bash/bashrc ]] || fail '~/.bashrc is not the chezmoi-managed symlink; apply chezmoi before syncing'
+for path in "$HOME/.profile" "$HOME/.config/bash" "$HOME/.config/vim"; do
+  [[ -e "$path" || -L "$path" ]] || fail "required local config is missing: $path (apply chezmoi first)"
+done
+
+remote_script=$(cat <<'REMOTE_SCRIPT'
+set -euo pipefail
+umask 077
+mkdir -p "$HOME/.cache" "$HOME/.local/state/chezmoi-ssh-backups"
+stage=$(mktemp -d "$HOME/.cache/chezmoi-ssh-sync.XXXXXX")
+backup=
+trap 'rm -rf "$stage"' EXIT
+
+tar -xzf - -C "$stage"
+
+ensure_backup() {
+  if [[ -z "$backup" ]]; then
+    backup=$(mktemp -d "$HOME/.local/state/chezmoi-ssh-backups/$(date +%Y%m%dT%H%M%S).XXXXXX")
+  fi
+}
+backup_entry() {
+  local entry=$1 target="$HOME/$1"
+  ensure_backup
+  mkdir -p "$backup/$(dirname "$entry")"
+  mv "$target" "$backup/$entry"
+}
+
+# Bash reads only the first available login file. Preserve legacy alternatives
+# in the backup so the synchronized .profile is read on subsequent logins.
+for legacy in .bash_profile .bash_login; do
+  if [[ -e "$HOME/$legacy" || -L "$HOME/$legacy" ]]; then
+    backup_entry "$legacy"
+  fi
+done
+
+same_entry() {
+  local staged=$1 target=$2
+  if [[ -L "$staged" && -L "$target" ]]; then
+    [[ "$(readlink "$staged")" == "$(readlink "$target")" ]]
+  elif [[ -f "$staged" && -f "$target" && ! -L "$target" ]]; then
+    cmp -s "$staged" "$target"
+  elif [[ -d "$staged" && -d "$target" && ! -L "$target" ]]; then
+    diff -qr "$staged" "$target" >/dev/null 2>&1
+  else
+    return 1
+  fi
+}
+
+for entry in .bashrc .profile .config/bash .config/vim; do
+  staged="$stage/$entry"
+  target="$HOME/$entry"
+  [[ -e "$staged" || -L "$staged" ]] || { printf 'Missing archive entry: %s\\n' "$entry" >&2; exit 1; }
+  if same_entry "$staged" "$target"; then
+    continue
+  fi
+  if [[ -e "$target" || -L "$target" ]]; then
+    backup_entry "$entry"
+  fi
+  mkdir -p "$(dirname "$target")"
+  mv "$staged" "$target"
+done
+
+if [[ -n "$backup" ]]; then
+  printf 'SSH dotfiles installed. Previous files backed up to %s\\n' "$backup" >&2
+fi
+REMOTE_SCRIPT
+)
+remote_script_b64=$(printf '%s' "$remote_script" | base64 | tr -d '\r\n')
+# The decoded script is passed to Bash's -c while SSH stdin remains available
+# for the tar archive. The only interpolated content is base64-safe.
+remote_command="bash -c \"\$(printf '%s' '$remote_script_b64' | base64 -d)\""
+
+# Disable LocalCommand for the nested transport connection to prevent recursion.
+tar -czf - -C "$HOME" .bashrc .profile .config/bash .config/vim \
+  | ssh -T -o PermitLocalCommand=no -p "$port" "$remote_user@$host" "$remote_command"

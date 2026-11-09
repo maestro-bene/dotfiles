@@ -1,0 +1,11 @@
+# Pi packages managed as source IDs, not checked-in package code.
+# The versions/refs are pinned; update them here deliberately.
+npm:pi-web-access
+npm:@accolver/bash-guard
+npm:pi-browser
+npm:pi-observational-memory
+npm:pi-voice-stt
+{{ if eq .multiplexer "tmux" }}
+# Interactive subagents uses a tmux-backed package; omit it for Rex.
+git:github.com/amosblomqvist/pi-interactive-subagents
+{{ end }}

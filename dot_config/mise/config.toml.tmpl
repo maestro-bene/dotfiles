@@ -1,0 +1,8 @@
+[tools]
+go = "1.26.1"
+node = "23.11.1"
+python = "3.11.2"
+rust = "stable"
+{{- if eq .multiplexer "rex" }}
+"github:rtuszik/sex" = "0.4.6"
+{{- end }}

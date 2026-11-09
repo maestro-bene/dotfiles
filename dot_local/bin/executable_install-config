@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Interactive bootstrap for the supported macOS and Ubuntu/Debian platforms.
+# Install manifests live in ~/.local/share/install-dotfiles. The script can run
+# from a source checkout or after chezmoi has been initialized. It never handles
+# pass values.
+
+fail() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+[[ -t 0 && -t 1 ]] || fail 'Run this installer in an interactive terminal (stdin and stdout must be TTYs).'
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+source_root="$(cd -- "$script_dir/../.." && pwd -P)"
+install_data="${XDG_DATA_HOME:-$HOME/.local/share}/install-dotfiles"
+[[ -d "$install_data" ]] || install_data="$script_dir/../share/install-dotfiles"
+[[ -f "$install_data/Brewfile" && -f "$install_data/apt-packages.txt" ]] || fail 'Install manifests are missing; expected them in ~/.local/share/install-dotfiles.'
+
+os="$(uname -s)"
+arch="$(uname -m)"
+case "$arch" in
+  arm64|aarch64) arch=arm64 ;;
+  x86_64|amd64) arch=amd64 ;;
+  *) fail "Unsupported architecture: $arch (supported: arm64/aarch64, x86_64/amd64)." ;;
+esac
+
+case "$os" in
+  Darwin)
+    platform=macos
+    ;;
+  Linux)
+    platform=linux
+    command -v apt-get >/dev/null 2>&1 || fail 'Linux support is limited to Ubuntu/Debian systems with apt-get.'
+    os_id="$(sed -n 's/^ID=//p' /etc/os-release 2>/dev/null | head -n 1 | tr -d '\"')"
+    os_like="$(sed -n 's/^ID_LIKE=//p' /etc/os-release 2>/dev/null | head -n 1 | tr -d '\"')"
+    case " $os_id $os_like " in
+      *' debian '*|*' ubuntu '*) ;;
+      *) fail "Unsupported Linux distribution (ID=$os_id ID_LIKE=$os_like); use Ubuntu or Debian." ;;
+    esac
+    kernel_release="$(uname -r | tr '[:upper:]' '[:lower:]')"
+    if [[ "$kernel_release" == *microsoft* && "$kernel_release" != *wsl2* ]]; then
+      fail 'WSL 1 is not supported; use WSL 2.'
+    fi
+    platform=linux
+    ;;
+  *)
+    fail "Unsupported operating system: $os (supported: macOS and Ubuntu/Debian Linux, including WSL 2)."
+    ;;
+esac
+
+if [[ "$platform" == macos && "$arch" != arm64 && "$arch" != amd64 ]]; then
+  fail "Unsupported macOS architecture: $arch."
+fi
+
+prompt_choice() {
+  local label="$1" default="$2" answer choice
+  shift 2
+  local -a choices=("$@")
+  while true; do
+    printf '%s [%s]: ' "$label" "$default" >&2
+    IFS= read -r answer
+    answer="${answer:-$default}"
+    for choice in "${choices[@]}"; do
+      if [[ "$answer" == "$choice" ]]; then
+        printf '%s' "$answer"
+        return 0
+      fi
+    done
+    printf 'Choose one of: %s.\n' "$(IFS=', '; printf '%s' "${choices[*]}")" >&2
+  done
+}
+
+profile="$(prompt_choice 'Profile (public/personal/work)' public public personal work)"
+backend="$(prompt_choice 'Terminal/worktree backend (tmux/rex)' tmux tmux rex)"
+
+if [[ "$backend" == rex ]]; then
+  case "$platform/$arch" in
+    macos/arm64|linux/amd64) ;;
+    *) fail "Workrex provides verified prebuilt installers only for macOS Apple Silicon and Linux x86_64; unsupported target: $platform/$arch. See https://kong109.github.io/workrex/guide/installation/" ;;
+  esac
+fi
+
+printf '\nSelected: %s profile, %s backend, %s (%s).\n' "$profile" "$backend" "$platform" "$arch"
+if [[ "$profile" == personal ]]; then
+  printf 'Before applying, configure these existing password-store entries yourself:\n'
+  printf '  chezmoi/personal/git_user_name\n  chezmoi/personal/git_user_email\n  chezmoi/personal/git_signing_key\n'
+elif [[ "$profile" == work ]]; then
+  printf 'Before applying, configure these existing password-store entries yourself:\n'
+  printf '  chezmoi/work/git_user_name\n  chezmoi/work/git_user_email\n  chezmoi/work/git_signing_key\n  chezmoi/work/gitlab_host_1\n  chezmoi/work/gitlab_1_proxy\n  chezmoi/work/ssh_include_path_1\n  chezmoi/work/ai_api_url\n  chezmoi/work/ai_api_key\n'
+fi
+
+if [[ "$platform" == linux ]]; then
+  command -v sudo >/dev/null 2>&1 || fail 'sudo is required to install the listed APT prerequisites.'
+  printf '\nInstalling only the APT list in %s...\n' "$install_data/apt-packages.txt"
+  sudo apt-get update
+  # Read the repository's package list without eval or word splitting.
+  apt_packages=()
+  while IFS= read -r package || [[ -n "$package" ]]; do
+    package="${package%%#*}"
+    package="$(printf '%s' "$package" | tr -d '[:space:]')"
+    [[ -n "$package" ]] && apt_packages+=("$package")
+  done < "$install_data/apt-packages.txt"
+  ((${#apt_packages[@]} > 0)) || fail "No packages found in $install_data/apt-packages.txt."
+  sudo apt-get install -y "${apt_packages[@]}"
+  # These are Homebrew's documented bootstrap requirements and are not in the
+  # curated APT list. Install only either tool that is currently missing.
+  missing_bootstrap=()
+  command -v git >/dev/null 2>&1 || missing_bootstrap+=(git)
+  command -v curl >/dev/null 2>&1 || missing_bootstrap+=(curl)
+  if [[ ${#missing_bootstrap[@]} -gt 0 ]]; then
+    printf 'Installing Homebrew bootstrap requirements: %s\n' "${missing_bootstrap[*]}"
+    sudo apt-get install -y "${missing_bootstrap[@]}"
+  fi
+fi
+
+find_brew() {
+  if command -v brew >/dev/null 2>&1; then
+    command -v brew
+    return 0
+  fi
+  for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+    if [[ -x "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if ! brew_bin="$(find_brew)"; then
+  printf '\nHomebrew is not installed. Starting the official Homebrew installer.\n'
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  brew_bin="$(find_brew)" || fail 'Homebrew installer finished, but brew was not found. Follow the official installer next steps and rerun this script.'
+fi
+
+if [[ "$platform" == linux ]]; then
+  # Configure this process without editing the user's shell startup files.
+  eval "$("$brew_bin" shellenv)"
+  brew_bin="$(command -v brew)"
+fi
+
+printf '\nInstalling the shared Homebrew manifest: %s\n' "$install_data/Brewfile"
+"$brew_bin" bundle --file="$install_data/Brewfile"
+if [[ "$backend" == tmux ]]; then
+  printf 'Installing the tmux/workmux manifest: %s\n' "$install_data/Brewfile.tmux"
+  "$brew_bin" bundle --file="$install_data/Brewfile.tmux"
+fi
+
+if [[ "$backend" == rex ]]; then
+  printf '\nInstalling Workrex using its official installer. This does not install Rex itself.\n'
+  curl -fsSL https://raw.githubusercontent.com/kong109/workrex/main/scripts/install-workrex.sh | bash
+  printf 'Install Rex separately using the official instructions: %s\n' \
+    'https://www.superlogical.com/rex/docs/installation'
+  if [[ "$platform" == linux ]]; then
+    printf 'Linux server-specific instructions: %s\n' \
+      'https://www.superlogical.com/rex/docs/linux/installation'
+  fi
+fi
+
+if ! command -v chezmoi >/dev/null 2>&1; then
+  printf '\nInstalling chezmoi from the selected Homebrew bundle...\n'
+  "$brew_bin" install chezmoi
+fi
+command -v chezmoi >/dev/null 2>&1 || fail 'chezmoi was not found after installing the shared Homebrew bundle.'
+
+# When invoked from ~/.local/bin, use the initialized chezmoi source rather
+# than treating the home directory as a source checkout.
+chezmoi_source="$(chezmoi source-path 2>/dev/null || true)"
+if [[ ! -f "$source_root/.chezmoi.toml.tmpl" && -f "$chezmoi_source/.chezmoi.toml.tmpl" ]]; then
+  source_root="$chezmoi_source"
+fi
+[[ -f "$source_root/.chezmoi.toml.tmpl" ]] || fail "Could not locate the chezmoi source tree: $source_root"
+
+# Select this run without rewriting the user's persistent chezmoi config.
+chezmoi_data="{\"profile\":\"$profile\",\"multiplexer\":\"$backend\"}"
+printf '\nInitializing chezmoi from %s...\n' "$source_root"
+chezmoi --override-data "$chezmoi_data" init --source "$source_root"
+
+if [[ "$profile" == public ]]; then
+  printf '\nReview the proposed changes below. No secret-backed profile is selected.\n'
+  chezmoi --override-data "$chezmoi_data" diff
+else
+  printf '\nFor privacy, the installer will not print a chezmoi diff for this profile; rendered templates can contain private values.\n'
+  printf 'Confirm that you have populated the listed password-store entries and trust the source templates before applying.\n'
+fi
+
+printf '\nApply the selected dotfiles now? [y/N]: '
+IFS= read -r apply_answer
+case "$apply_answer" in
+  y|Y|yes|YES|Yes)
+    chezmoi --override-data "$chezmoi_data" apply
+    printf '\nSelected profile/backend applied. To retain this choice for future chezmoi commands, set data.profile = %s and data.multiplexer = %s in your chezmoi config.\n' "$profile" "$backend"
+
+    printf '\nInstalling Pi with its official installer...\n'
+    curl -fsSL https://pi.dev/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+    printf '\nInstalling the Pi packages from the dotfiles manifest...\n'
+    bash "$source_root/dot_local/bin/executable_install-pi-packages"
+    printf '\nPi is ready. Configure a provider with /login and choose a model with /model.\n'
+    ;;
+  *)
+    printf 'Not applying dotfiles. Review with chezmoi diff, then apply with the selected data when ready.\n'
+    printf 'Selected data for later commands: --override-data %s\n' "$chezmoi_data"
+    ;;
+esac

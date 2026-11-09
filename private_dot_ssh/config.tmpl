@@ -1,0 +1,22 @@
+{{- if eq .profile "work" }}
+Include {{ pass "chezmoi/work/ssh_include_path_1" }}
+{{- end }}
+
+Host *
+    AddKeysToAgent yes
+    IdentitiesOnly yes
+    PubkeyAuthentication yes
+    PreferredAuthentications publickey,password
+    TCPKeepAlive yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 10
+    StrictHostKeyChecking accept-new
+    ControlMaster auto
+    ControlPersist 10h
+    ControlPath ~/.ssh/mux-%h
+    Include config.d/*
+
+Host *
+Match User gcudennec SessionType shell
+    PermitLocalCommand yes
+    LocalCommand ~/.local/bin/ssh-sync-config "%n" "%p" "%r"

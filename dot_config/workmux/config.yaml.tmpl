@@ -1,0 +1,12 @@
+# Shared configuration used by workmux (tmux) and workrex (Rex).
+# `pi` is supported as an agent by both backends; the Pi extension reports status.
+nerdfont: true
+agent: pi
+# Keep Pi status available in workrex without prefixing Rex window labels.
+status_icons:
+  working: ""
+  waiting: ""
+  done: ""
+panes:
+  - command: <agent>
+    focus: true

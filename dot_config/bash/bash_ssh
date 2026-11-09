@@ -1,0 +1,20 @@
+# Interactive SSH-only settings.
+# Sourced from bashrc only for interactive shells with SSH environment markers.
+
+# Keep remote command history useful across concurrent SSH shells. Preserve any
+# prompt hook (for example Starship) already configured by bash_interactive.
+__bash_ssh_history_sync() {
+    history -a
+    history -n
+}
+
+case ";${PROMPT_COMMAND:-};" in
+    *";__bash_ssh_history_sync;"*) ;;
+    *)
+        if [ -n "${PROMPT_COMMAND:-}" ]; then
+            PROMPT_COMMAND="__bash_ssh_history_sync;${PROMPT_COMMAND}"
+        else
+            PROMPT_COMMAND=__bash_ssh_history_sync
+        fi
+        ;;
+esac

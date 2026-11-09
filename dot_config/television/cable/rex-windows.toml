@@ -1,0 +1,23 @@
+shell = "bash"
+
+[metadata]
+name = "rex-tabs"
+description = "List, preview, and select tabs in the current Rex session"
+requirements = ["rex", "jq"]
+
+[source]
+command = "rex do rex_tab_list | jq -r ."
+watch = 1.0
+display = "{split:\t:1} [{split:\t:2}] {split:\t:3}"
+output = "{split:\t:0}"
+
+[preview]
+command = "rex do rex_tab_preview window_id='{split:\t:0}' | jq -r ."
+
+[keybindings]
+enter = "actions:select"
+
+[actions.select]
+description = "Select the chosen tab in the current Rex session"
+command = "rex do rex_tab_select window_id='{split:\t:0}' | jq -r ."
+mode = "execute"

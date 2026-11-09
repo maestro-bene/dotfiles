@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+kind=$1
+name=$2
+path=$3
+
+if [[ $kind == rex ]]; then
+  sex preview "$name" | head -n 20
+  exit 0
+fi
+
+if [[ $kind == zoxide ]]; then
+  for file in README.md README.rst README.txt README; do
+    if [[ -f "$path/$file" ]]; then
+      bat --color=always --style=plain --line-range :20 "$path/$file"
+      exit 0
+    fi
+  done
+  lsd --color=always --icon=never -la "$path" | head -n 20
+  exit 0
+fi
+
+echo "Unsupported sex entry: $kind" >&2
+exit 1

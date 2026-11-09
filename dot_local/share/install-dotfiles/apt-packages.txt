@@ -1,0 +1,6 @@
+# Minimal Ubuntu/Debian system prerequisites builds.
+# Git and curl are needed earlier to bootstrap chezmoi/Homebrew.
+build-essential
+procps
+file
+unzip

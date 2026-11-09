@@ -1,0 +1,22 @@
+[metadata]
+name = "rex-sessions"
+description = "List, preview, and switch between Rex sessions"
+requirements = ["rex", "jq"]
+
+[source]
+command = "rex ls --json | jq -r '.sessions[] | [.session_id, .label] | @tsv'"
+display = "{split:\t:1}"
+output = "{split:\t:0}"
+
+[preview]
+command = "rex session inspect '{split:\t:0}' --json | jq -r '. as $s | \"Session: \\($s.label)\\n\\($s.windows | length) windows\", ($s.windows[]? | \"\\n## \\(.label) (\\([.layers[].blocks[]?] | length) blocks)\", (.layers[].blocks[]? | \"  \\(.label) — \\(.flavor)\"))'"
+
+[actions.switch]
+description = "Switch the Rex app to the selected session"
+command = "rex do session.select session_id='{split:\t:0}'"
+mode = "execute"
+
+[actions.kill]
+description = "Kill the selected Rex session"
+command = "rex session kill '{split:\t:0}'"
+mode = "fork"

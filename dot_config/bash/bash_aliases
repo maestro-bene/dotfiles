@@ -1,0 +1,16 @@
+# Aliases shared by Bash shells.
+if [ -x /usr/bin/dircolors ]; then
+    test -r "$HOME/.dircolors" && eval "$(dircolors -b "$HOME/.dircolors")" || eval "$(dircolors -b)"
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+alias ls='ls -GF'
+alias ll='ls -GlF'
+alias la='ls -AGF'
+alias lla='ls -AlGF'
+alias c='clear'
+alias e='exit'

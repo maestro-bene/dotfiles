@@ -1,0 +1,6 @@
+color:
+  theme: custom
+sorting:
+  column: name
+  reverse: false
+  dir-grouping: first

@@ -1,0 +1,27 @@
+shell = "bash"
+
+[metadata]
+name = "sex"
+description = "Rex sessions and zoxide directories"
+requirements = ["sex", "jq", "bat"]
+
+[source]
+command = "sex list --rex --zoxide --json --hide-current | jq -r '.[] | [.source, .name, .path, (.session_id // \"\")] | @tsv'"
+no_sort = true
+display = "[{split:\t:0}] {split:\t:1}"
+output = "{split:\t:1}"
+
+[preview]
+command = "sex-preview '{split:\t:0}' '{split:\t:1}' '{split:\t:2}'"
+
+[ui.preview_panel]
+size = 45
+word_wrap = true
+
+[keybindings]
+enter = "actions:connect"
+
+[actions.connect]
+description = "Switch to a Rex session or open a directory as a session"
+command = "sex connect '{split:\t:1}'"
+mode = "execute"

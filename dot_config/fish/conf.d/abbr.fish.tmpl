@@ -1,0 +1,186 @@
+# NOTE: manage fish abbreviations
+# https://fishshell.com/docs/current/cmds/abbr.html
+
+if command -q mise
+    abbr ml 'mise ls'
+    abbr mi 'mise install'
+    abbr mu 'mise use'
+    abbr mx 'mise exec --'
+end
+
+if command -q brew
+    abbr bi "brew install"
+    abbr bu "brew uninstall"
+end
+
+abbr c "clear"
+
+if command -q chezmoi
+    abbr cm "chezmoi cd"
+end
+
+if command -q docker
+    abbr dc "docker compose"
+    abbr dcu "docker compose up -d --build"
+    abbr dcd "docker compose down -v"
+    abbr dcr "docker compose restart"
+    abbr dps "docker ps"
+    abbr dsp "docker system prune"
+end
+
+abbr e "exit"
+
+if functions -q fisher
+    abbr fi "fisher install"
+    abbr fr "fisher refresh"
+    abbr fu "fisher update"
+    abbr fl "fisher list"
+end
+
+if command -q git
+    abbr ga "git add ."
+    abbr gb "git branch -v"
+    abbr gc "git commit"
+    abbr gco "git checkout"
+    abbr gd "git branch --delete"
+    abbr gf "git fetch --all"
+    abbr gpom "git pull origin main"
+    abbr grao "git remote add origin"
+    abbr gs "git status"
+end
+
+{{- if eq .multiplexer "tmux" }}
+if command -q fzf-tmux
+    abbr hd "history delete --exact --case-sensitive \'(history | fzf-tmux -p -m)\'"
+end
+{{- end }}
+
+if command -q lsd
+    abbr l "lsd --group-dirs first"
+    abbr ls "lsd --group-dirs first"
+    abbr ll "lsd --group-dirs first -l"
+    abbr la "lsd --group-dirs first -A"
+    abbr lla "lsd --group-dirs first -Al"
+    abbr lt "lsd --group-dirs last -A --tree"
+end
+if command -q lazygit
+    abbr lg "lazygit"
+end
+
+if command -q mvn
+    abbr mci "mvn clean install"
+end
+
+if command -q npm
+    abbr nb "npm run build"
+    abbr nd "npm run dev"
+    abbr ni "npm install"
+    abbr nt "npm run test"
+end
+
+{{- if eq .chezmoi.os "darwin" }}
+if command -q pbcopy
+    abbr pwdc "pwd | pbcopy"
+end
+{{- else }}
+if command -q wl-copy
+    abbr pwdc "pwd | wl-copy"
+end
+{{- end }}
+
+abbr rmr "rm -r"
+
+if command -q fish
+    abbr sf "source ~/.config/fish/config.fish"
+end
+{{- if eq .multiplexer "tmux" }}
+if command -q tmux
+    abbr st "tmux source ~/.config/tmux/tmux.conf"
+end
+{{- else }}
+if command -q rex
+    abbr st "rex config reload"
+end
+{{- end }}
+
+if command -q nvim
+    abbr rconfig "cd ~/.config && nvim . ; cd -"
+    abbr v "nvim"
+    abbr vd "nvim ."
+    abbr vimc "nvim ~/.config/vim/vimrc"
+end
+if command -q nvim; and command -q fd; and command -q fzf
+    abbr vfzf "nvim (fd --type f --hidden --follow --exclude .git | fzf)"
+end
+if command -q nvim
+    abbr vgrep "nvim +Grep"
+end
+
+{{- if eq .multiplexer "tmux" }}
+if command -q tmux
+    abbr ta "tmux a"
+    abbr tat "tmux attach -t"
+    abbr tk "tmux kill-server"
+    abbr tkt "tmux kill-session -t"
+    abbr tls "tmux list-sessions"
+    abbr tlw "tmux list-windows"
+    abbr tn "tmux new -s (basename (pwd))"
+end
+{{- end }}
+abbr td "t .config"
+if command -q tldr; and command -q fzf
+    abbr tr "tldr --list | fzf --header 'tldr (tealdeer)' --reverse --preview 'tldr {1} --color=always' --preview-window=right,80% | xargs tldr"
+end
+
+#abbr tt "touch t && chmod +x t && echo -e '#!/usr/bin/env bash\n' > t && nvim t"
+
+if command -q fzf
+    abbr x "chmod +x (ls | fzf --header='chmod +x')"
+    abbr nx "chmod -x (ls | fzf --header='chmod -x')"
+end
+
+{{- if eq .multiplexer "tmux" }}
+    set -l workmux_cmd workmux
+{{- else }}
+    set -l workmux_cmd workrex
+{{- end }}
+    set -l workmux_command (command -s $workmux_cmd)
+if test -n "$workmux_command"
+    abbr wm "$workmux_cmd"
+    abbr wml "$workmux_cmd list"
+    abbr wmd "$workmux_cmd dashboard"
+    abbr wmp "$workmux_cmd path"
+    abbr wma "$workmux_cmd add"
+    abbr wmo "$workmux_cmd open"
+    abbr wmi "$workmux_cmd init"
+    abbr wmce "$workmux_cmd config edit"
+    abbr wmm "$workmux_cmd merge"
+    abbr wmr "$workmux_cmd remove"
+end
+
+if command -q wget
+    abbr wgh "wget --spider https://www.github.com"
+end
+
+if command -q chezmoi
+    abbr ze "chezmoi edit"
+    abbr fishc "chezmoi edit ~/.config/fish/; chezmoi apply; source ~/.config/fish/config.fish"
+    abbr sshc "chezmoi edit ~/.ssh/config"
+    abbr config "chezmoi edit ~/.config; chezmoi apply;"
+{{- if eq .multiplexer "tmux" }}
+    abbr tmuxc "chezmoi edit ~/.config/tmux/tmux.conf; tmux source ~/.config/tmux/tmux.conf"
+{{- else }}
+    abbr rexc "chezmoi edit ~/.config/rex/; chezmoi apply; rex config reload"
+{{- end }}
+    abbr nvimc "chezmoi edit ~/.config/nvim/ ; chezmoi apply"
+    abbr bashc "chezmoi edit ~/.config/bash/bashrc"
+    abbr gitc "chezmoi edit ~/.gitconfig"
+    abbr zcd "chezmoi cd"
+    abbr zd "chezmoi diff"
+    abbr zs "chezmoi status"
+    abbr za "chezmoi apply"
+end
+if command -q nvim
+    abbr rfishc "nvim ~/.config/fish/"
+    abbr rsshc "cd ~/.ssh && nvim ~/.ssh/config.d"
+end

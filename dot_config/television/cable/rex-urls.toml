@@ -1,0 +1,23 @@
+shell = "fish"
+
+[metadata]
+name = "rex-urls"
+description = "Pick and open deduplicated URLs from the current Rex session"
+requirements = ["rex", "jq"]
+
+[source]
+command = "rex do rex_url_source | jq -r ."
+display = "{split:\t:1}"
+output = "{split:\t:0}"
+
+[preview]
+command = "printf 'URL: %s\\n' '{split:\t:1}'"
+
+[keybindings]
+enter = "actions:open"
+ctrl-o = "actions:open"
+
+[actions.open]
+description = "Open the selected URL in the system browser"
+command = 'rex do rex_url_open url="{split:\t:0}"'
+mode = "execute"

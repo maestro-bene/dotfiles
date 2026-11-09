@@ -1,0 +1,2 @@
+# Optional personal terminal application; macOS only.
+cask "ghostty"

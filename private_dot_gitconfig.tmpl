@@ -1,0 +1,69 @@
+{{- if or (eq .profile "work") (eq .profile "personal") }}
+[user]
+{{- if eq .profile "work" }}
+    name = {{ pass "chezmoi/work/git_user_name" }}
+    email = {{ pass "chezmoi/work/git_user_email" }}
+    signingkey = {{ pass "chezmoi/work/git_signing_key" }}
+{{- else }}
+    name = {{ pass "chezmoi/personal/git_user_name" }}
+    email = {{ pass "chezmoi/personal/git_user_email" }}
+    signingkey = {{ pass "chezmoi/personal/git_signing_key" }}
+{{- end }}
+{{- end }}
+
+{{- if eq .profile "work" }}
+[http "https://{{ pass "chezmoi/work/gitlab_host_1" }}"]
+    proxy = {{ pass "chezmoi/work/gitlab_1_proxy" }}
+
+[https "https://{{ pass "chezmoi/work/gitlab_host_1" }}"]
+    proxy = {{ pass "chezmoi/work/gitlab_1_proxy" }}
+{{- end }}
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true
+
+[core]
+    pager = delta
+
+[delta]
+    features = side-by-side line-numbers decorations
+    navigate = true
+    light = false
+
+[interactive]
+    diffFilter = delta --color-only --diff-so-fancy
+
+{{- if ne .profile "public" }}
+[credential]
+    helper = store
+{{- end }}
+
+[commit]
+{{- if or (eq .profile "work") (eq .profile "personal") }}
+	gpgsign = true
+{{- else }}
+	gpgsign = false
+{{- end }}
+
+[tag]
+{{- if or (eq .profile "work") (eq .profile "personal") }}
+	gpgsign = true
+{{- else }}
+	gpgsign = false
+{{- end }}
+
+{{- if eq .profile "work" }}
+[gpg]
+    format = x509
+
+[gpg "x509"]
+    program = smimesign.exe
+
+{{- else if eq .profile "personal" }}
+
+[gpg]
+    format = openpgp
+{{- end }}

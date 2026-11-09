@@ -1,0 +1,5 @@
+require("core.general")
+require("core.functions")
+require("core.keymaps")
+require("core.options")
+require("core.autocmds")

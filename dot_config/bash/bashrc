@@ -1,0 +1,36 @@
+# Minimal Bash setup shared by login, interactive, and remote shells.
+
+# --- History settings ---
+export HISTFILE="$HOME/.bash_history"
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# --- General settings ---
+shopt -s checkwinsize
+shopt -s globstar
+
+# lesspipe (safe)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# Colors GCC
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# Temp dir
+[ -d "$HOME/.tmp" ] && export TMPDIR="$HOME/.tmp/"
+
+# Shared aliases; safe in non-interactive shells too.
+[ -f "$HOME/.config/bash/bash_aliases" ] && . "$HOME/.config/bash/bash_aliases"
+
+# Interactive prompt, tools, and completions.
+case $- in
+*i*)
+    [ -f "$HOME/.config/bash/bash_interactive" ] && . "$HOME/.config/bash/bash_interactive"
+
+    # Session-only quality-of-life settings for remote interactive Bash.
+    if [ -n "${SSH_CONNECTION:-}${SSH_CLIENT:-}${SSH_TTY:-}" ] && [ -f "$HOME/.config/bash/bash_ssh" ]; then
+        . "$HOME/.config/bash/bash_ssh"
+    fi
+    ;;
+esac

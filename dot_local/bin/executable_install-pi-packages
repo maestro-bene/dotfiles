@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fail() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+package_file="${XDG_DATA_HOME:-$HOME/.local/share}/install-dotfiles/pi-packages.txt"
+[[ -f "$package_file" ]] || package_file="$script_dir/../share/install-dotfiles/pi-packages.txt"
+[[ -f "$package_file" ]] || fail "Pi package manifest not found: $package_file"
+
+pi_bin="$HOME/.local/bin/pi"
+[[ -x "$pi_bin" ]] || pi_bin="$(command -v pi || true)"
+[[ -n "$pi_bin" && -x "$pi_bin" ]] || fail 'Pi installer completed without an executable pi command.'
+
+packages=()
+while IFS= read -r package || [[ -n "$package" ]]; do
+  package="$(printf '%s' "$package" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+  [[ -z "$package" || "$package" == \#* ]] || packages+=("$package")
+done < "$package_file"
+((${#packages[@]} > 0)) || fail "No package sources found in $package_file."
+
+# Pi stores package declarations in settings.json. Package installs are
+# idempotent by source identity; run pi install for each manifest entry so Pi
+# can refresh changed version pins / git refs while leaving unrelated packages
+# such as personal themes untouched.
+for package in "${packages[@]}"; do
+  printf '\nReconciling Pi package: %s\n' "$package"
+  "$pi_bin" install "$package"
+done

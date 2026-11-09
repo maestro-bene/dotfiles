@@ -1,0 +1,42 @@
+**/node_modules/**
+**/bun.lock
+**/package.json
+
+# Bootstrap/repository documentation belongs in the chezmoi source, not ~.
+README.md
+LICENSE
+docs/**
+
+key.txt.age
+
+# Keep local-only editor files out of the managed target.
+.config/nvim/.gitignore
+.config/nvim/README.md
+{{ if ne .profile "work" }}
+.local/bin/setup-git-workflow-for-work
+{{ end }}
+{{ if eq .profile "public" }}
+.gitconfig
+{{ end }}
+{{ if ne .multiplexer "rex" }}
+.config/rex/**
+.config/television/cable/sex.toml
+.config/television/cable/rex-*.toml
+.pi/agent/skills/workrex/**
+{{ else }}
+.pi/agent/skills/workmux/**
+.config/tmux/**
+{{ end }}
+{{ if eq .multiplexer "tmux" }}
+.config/television/cable/sex.toml
+.config/television/cable/rex-*.toml
+{{ else }}
+.config/television/cable/sesh.toml
+.config/television/cable/tmux-sessions.toml
+.config/television/cable/tmux-windows.toml
+{{ end }}
+{{ if or (eq .profile "work") (eq .profile "personal") }}
+.config/nvim/lua/maestro-bene/plugins/ai/kilo.lua
+{{ end }}
+*nvim/dependencies/*
+*nvim/db_ui/connections.json
