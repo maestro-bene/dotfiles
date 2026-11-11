@@ -20,8 +20,8 @@ enter = "actions:cd"
 ctrl-e = "actions:edit"
 
 [actions.cd]
-description = "Open a new shell in the selected repository"
-command = "cd '{}' && $SHELL"
+description = "Open the selected repository in a new Rex tab"
+command = "rex do rex_new_tab_at path='{}'"
 mode = "execute"
 
 [actions.edit]

@@ -10,6 +10,6 @@ command = "printf '%s\n' \"$PATH\" | tr ':' '\n'"
 command = "fd -tx -d1 . \"{}\" -X printf \"%s\n\" \"{/}\" | sort -f | bat -n --color=always"
 
 [actions.cd]
-description = "Open a shell in the selected PATH directory"
-command = "cd '{}' && $SHELL"
+description = "Open the selected PATH directory in a new Rex tab"
+command = "rex do rex_new_tab_at path='{}'"
 mode = "execute"

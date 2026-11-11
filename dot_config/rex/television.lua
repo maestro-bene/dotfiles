@@ -139,6 +139,11 @@ local function shell_quote(value)
   return "'" .. tostring(value):gsub("'", "'\\''") .. "'"
 end
 
+local function fish_quote(value)
+  local escaped = tostring(value):gsub("\\", "\\\\"):gsub("'", "\\'")
+  return "'" .. escaped .. "'"
+end
+
 local function layout_rects(node, rects)
   if not node then return end
   if node.block_id then
@@ -558,6 +563,69 @@ local function register_actions()
       }
       if not window then error(err or "could not create Rex tab", 0) end
       return { window_id = window.window_id }
+    end,
+  }
+
+  rex.action{
+    name = "rex_new_tab_at",
+    title = "Open Directory in New Rex Tab",
+    description = "Open a directory, optionally activating a Python venv, in a new shell tab.",
+    category = "Rex",
+    keywords = "directory path python venv tab",
+    args = { path = "string", venv = "string?" },
+    run = function(ctx, args)
+      local path = args.path
+      if not path or path == "" then error("missing directory path", 0) end
+      local picker_layer
+      if ctx.block_id then
+        local view = rex.session.view{}
+        for _, candidate in ipairs(view and view.windows or {}) do
+          for _, layer in ipairs(candidate.layers or {}) do
+            for _, block in ipairs(layer.blocks or {}) do
+              if block.block_id == ctx.block_id and layer.kind == "floating" then
+                picker_layer = layer.layer_id
+                break
+              end
+            end
+            if picker_layer then break end
+          end
+          if picker_layer then break end
+        end
+      end
+      local options = { cwd = path }
+      if args.venv and args.venv ~= "" then
+        options.command = {
+          "fish", "-l", "-C",
+          "source " .. fish_quote(args.venv .. "/bin/activate.fish"),
+        }
+      end
+      local window, err = rex.session.new_window{
+        layout = rex.layout.block{
+          flavor = SHELL,
+          options = options,
+        },
+      }
+      if not window then error(err or "could not create Rex tab", 0) end
+      if picker_layer then
+        local _, close_err = rex.call("session.close_layer", {
+          session_id = ctx.session_id,
+          layer_id = picker_layer,
+        })
+        if close_err then error(close_err, 0) end
+      end
+      local clients = rex.call("session.list_clients", { session_id = ctx.session_id }).clients or {}
+      for _, client in ipairs(clients) do
+        if client.info and client.info.kind == "app" and client.connection_state == "connected" then
+          local _, select_err = rex.call("client.perform", {
+            client_id = client.client_id,
+            action = "session.select",
+            args = { session_id = ctx.session_id, window_id = window.window_id },
+          })
+          if select_err then error(select_err, 0) end
+          return { window_id = window.window_id }
+        end
+      end
+      error("no connected Rex app client can select the new tab", 0)
     end,
   }
 

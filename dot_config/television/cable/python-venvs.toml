@@ -10,8 +10,8 @@ command = "find ~ -maxdepth 5 -type f -name 'pyvenv.cfg' 2>/dev/null | xargs -I{
 command = "cat '{}/pyvenv.cfg' 2>/dev/null && echo '' && echo 'Packages:' && '{}/bin/pip' list --format=columns 2>/dev/null | head -20"
 
 [actions.activate]
-description = "Open a shell with the selected venv activated"
-command = "source '{}/bin/activate' && $SHELL"
+description = "Open the selected venv in a new Rex tab"
+command = "rex do rex_new_tab_at path='{}' venv='{}'"
 mode = "execute"
 
 [actions.packages]

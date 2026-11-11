@@ -14,6 +14,6 @@ command = "df -h '{}' && echo && ls -la '{}' 2>/dev/null | head -20"
 enter = "actions:cd"
 
 [actions.cd]
-description = "Open a shell in the selected mount point"
-command = "cd '{}' && $SHELL"
+description = "Open the selected mount point in a new Rex tab"
+command = "rex do rex_new_tab_at path='{}'"
 mode = "execute"

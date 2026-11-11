@@ -9,7 +9,11 @@ HISTFILESIZE=2000
 
 # --- General settings ---
 shopt -s checkwinsize
-shopt -s globstar
+# globstar is unavailable in the macOS system Bash (3.2), so enable it only
+# when supported by the running Bash version.
+if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
+    shopt -s globstar
+fi
 
 # lesspipe (safe)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"

@@ -14,8 +14,8 @@ enter = "actions:cd"
 ctrl-d = "actions:remove"
 
 [actions.cd]
-description = "Change to the selected worktree"
-command = "cd '{}'; $SHELL"
+description = "Open the selected worktree in a new Rex tab"
+command = "rex do rex_new_tab_at path='{}'"
 mode = "execute"
 
 [actions.remove]
