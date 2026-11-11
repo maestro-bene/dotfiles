@@ -3,7 +3,7 @@ return {
   config = function()
     ---@type kilo.Opts
     vim.g.kilo_opts = {
-      -- Your configuration, if any
+      -- Add your configuration here, if needed
     }
   end,
 }

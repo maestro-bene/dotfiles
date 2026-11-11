@@ -42,13 +42,13 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- LSP Navigation avec Telescope
+-- LSP navigation with Telescope
 keymap.set("n", "gd", builtin.lsp_definitions, { desc = "Go to definition" })
 keymap.set("n", "gr", builtin.lsp_references, { desc = "Show references" })
 keymap.set("n", "gi", builtin.lsp_implementations, { desc = "Go to implementation" })
 keymap.set("n", "gt", builtin.lsp_type_definitions, { desc = "Go to type definition" })
 
--- Diagnostics avec Telescope
+-- Diagnostics with Telescope
 keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Show diagnostics" })
 
 keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Fuzzy find files in cwd" })
@@ -57,10 +57,10 @@ keymap.set("n", "<leader>fm", builtin.man_pages, { desc = "Fuzzy find man pages"
 keymap.set("n", "<leader>fs", builtin.live_grep, { desc = "Find string in cwd" })
 keymap.set("n", "<leader>fc", builtin.grep_string, { desc = "Find string under cursor in cwd" })
 
--- Symbols avec Telescope
+-- Symbols with Telescope
 keymap.set("n", "<leader>fS", builtin.lsp_workspace_symbols, { desc = "Workspace symbols" })
 
--- Git avec Telescope
+-- Git with Telescope
 keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "Git branches" })
 keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git commits" })
 keymap.set("n", "<leader>gf", builtin.git_files, { desc = "Git files" })

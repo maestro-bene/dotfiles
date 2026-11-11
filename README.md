@@ -1,45 +1,112 @@
 # Dotfiles
 
-Configuration macOS et Ubuntu/Debian (dont WSL 2), gérée avec [chezmoi](https://www.chezmoi.io/). Le dépôt configure le shell (Bash/Fish), Neovim, Television, Pi agent et un environnement au choix (tmux ou Rex).
+Personal configuration managed with [chezmoi](https://www.chezmoi.io/) for **macOS**, **Ubuntu/Debian**, and **WSL 2**.
 
-## Installation
+- **Terminal:** Ghostty, Rex, or another terminal emulator
+- **Multiplexer:** tmux or Rex
+- **Shell:** Fish by default, with Bash available
+- **Navigation:** Zoxide, Television, and Sesh/Sex
+- **Coding agent:** [Pi](https://pi.dev/)
 
-1. Sur macOS, installez les outils de ligne de commande Apple si nécessaire (`xcode-select --install`). Sur Linux, utilisez Ubuntu/Debian avec `sudo` et `apt`.
-2. Pour les profils `personal` ou `work`, préparez d’abord `pass` et les entrées requises dans [Profils et secrets](docs/backends.md). Le profil `public` n’en a pas besoin.
-3. Depuis le clone, lancez une seule fois, dans un terminal interactif :
+## 💻 Supported platforms
 
-   ```sh
-   bash dot_local/bin/executable_install-config
-   ```
+- macOS (Apple Silicon and Intel)
+- Ubuntu and Debian
+- WSL 2 on Ubuntu/Debian
 
-   Choisissez le profil (`public`, `personal`, `work`) et l’environnement (`tmux` ou `rex`), vérifiez les changements proposés, puis confirmez leur application.
+On macOS, Homebrew installs Apple command-line tools if needed. On Linux, the bootstrap and installer use APT and Homebrew. `curl` must be available to start the bootstrap; install it first if it is missing.
 
-L’installateur installe Homebrew si nécessaire, les paquets communs du `Brewfile` et ceux du backend choisi; sur Linux, il installe aussi les quelques prérequis APT. Il initialise Chezmoi puis propose d’appliquer les fichiers de configuration. **Le script n’est pas lancé une deuxième fois automatiquement.** Lors de l’application, Chezmoi en installe simplement une copie sous `~/.local/bin/install-config`, pour refaire volontairement ce parcours plus tard; ce second lancement n’est pas une étape de l’installation.
+## ⚙️ Profiles and secrets
 
-Le préfixe `executable_` est une convention de nommage Chezmoi : il transforme le fichier source en commande exécutable `~/.local/bin/install-config`. Le script existe donc à deux emplacements selon le moment où on l’utilise, mais il n’est exécuté qu’une fois pendant l’installation initiale.
+The profile and multiplexer are independent choices. Defaults are `public` and `tmux`.
 
-Le choix du profil et du backend ne vaut que pour cette exécution. Pour que les commandes Chezmoi suivantes gardent le même choix, lancez `chezmoi edit-config` et définissez, par exemple :
+- **public:** does not use `pass`.
+- **personal:** requires these `pass` entries, one per line:
+  - `chezmoi/personal/git_user_name`
+  - `chezmoi/personal/git_user_email`
+  - `chezmoi/personal/git_signing_key`
+- **work:** requires these `pass` entries, one per line:
+  - `chezmoi/work/git_user_name`
+  - `chezmoi/work/git_user_email`
+  - `chezmoi/work/git_signing_key`
+  - `chezmoi/work/gitlab_host_1`
+  - `chezmoi/work/gitlab_1_proxy`
+  - `chezmoi/work/ssh_include_path_1`
+  - `chezmoi/work/ai_api_url`
+  - `chezmoi/work/ai_api_key`
 
-```toml
-[data]
-    profile = "personal"
-    multiplexer = "rex"
+> [!IMPORTANT]
+> Initialize `pass` with your GPG key once, then create only the entries required by your selected profile. The installer does not configure `pass` or prompt for secret values. Never put secret values in this repository.
+
+For example, initialize `pass` with your GPG key ID, then run the relevant `pass insert` commands. Each command prompts securely for its value:
+
+```sh
+pass init YOUR_GPG_KEY_ID
+
+# For the personal profile:
+pass insert chezmoi/personal/git_user_name
+pass insert chezmoi/personal/git_user_email
+pass insert chezmoi/personal/git_signing_key
+
+# For the work profile, use these instead of or in addition to the personal entries:
+pass insert chezmoi/work/git_user_name
+pass insert chezmoi/work/git_user_email
+pass insert chezmoi/work/git_signing_key
+pass insert chezmoi/work/gitlab_host_1
+pass insert chezmoi/work/gitlab_1_proxy
+pass insert chezmoi/work/ssh_include_path_1
+pass insert chezmoi/work/ai_api_url
+pass insert chezmoi/work/ai_api_key
 ```
 
-## Après l’application
+## 🧰 Multiplexer environments
 
-Effectuez seulement les étapes correspondant à votre usage :
+| Choice     | Installed automatically                                  | Manual setup                                         |
+| ---------- | -------------------------------------------------------- | ---------------------------------------------------- |
+| **Common** | `sesh`, core tools, Fish and its plugins                 | —                                                    |
+| **tmux**   | tmux, workmux, Tpack; the installer runs `tpack install` | —                                                    |
+| **Rex**    | Workrex; `mise install` installs `sex` for this backend  | Install Rex, start it, and enable **Remote Control** |
 
-- **Outils de développement :** `mise install` installe les versions déclarées par la configuration (Go, Node.js, Python et Rust). Mise les rend disponibles dans l’environnement du shell.
-- **Fish :** les dotfiles configurent Fish (variables et intégrations), mais ne changent pas votre shell de connexion. Si vous voulez utiliser Fish par défaut, changez-le vous-même (`chsh -s "$(command -v fish)"`). Depuis Fish, lancez `fisher update` pour synchroniser les plugins déclarés dans `fish_plugins`.
-- **Television :** `tv update-channels` actualise les channels fournis par Television. Les channels personnalisés de ce dépôt sont installés avec les dotfiles.
-- **Pi agent :** l’installateur installe Pi et les extensions du manifeste. Au premier lancement, utilisez `/login` pour configurer un fournisseur, puis `/model` pour choisir un modèle. Le dépôt ne fournit ni compte ni identifiants.
-- **Neovim :** lancez `nvim`; ses plugins s’installent au premier démarrage. Si l’aperçu Markdown ne se construit pas, les [notes Neovim](dot_config/nvim/README.md#markdown-preview) donnent la commande de réparation.
-- **tmux uniquement :** installez TPM une fois, puis dans tmux utilisez le préfixe suivi de `I` pour installer les plugins. Détails dans [le guide des environnements](docs/backends.md#tmux--workmux).
-- **Rex uniquement :** installez Rex séparément, démarrez/configurez son serveur et activez Remote Control. Voir [le guide des environnements](docs/backends.md#rex--workrex).
+The profile (`public`, `personal`, or `work`) does not affect which tools are installed; the multiplexer choice does. `sesh` is installed for every environment. `sex` is installed only for Rex.
 
-Les guides complémentaires détaillent les différences de plateforme et les profils : [macOS](docs/macos.md), [Linux](docs/debian-based.md), [profils et environnements](docs/backends.md).
+> [!NOTE]
+> Rex itself is not installed automatically. Follow the [official installation instructions](https://www.superlogical.com/rex/docs/installation). On Linux, also see [Rex's Linux instructions](https://www.superlogical.com/rex/docs/linux/installation); the Linux server is still under test.
 
-## Ce que l’installation ne fait pas
+Tpack loads tmux plugins through `run 'tpack init'`; update them later with `tpack update`. Tpack accepts TPM-style plugin declarations but uses its own plugin directories. Do not run TPM alongside Tpack against the same directory. Ghostty is optional and is not installed by the main installer.
 
-Elle n’installe pas Ghostty, Rex, les plugins TPM ou les plugins Fish; les étapes utiles sont listées ci-dessus. Ghostty peut être installé séparément avec `brew install --cask ghostty`.
+## 🚀 Installation
+
+> [!WARNING]
+> The command below downloads and executes scripts from this repository. Review them first if you do not already trust the source.
+
+After configuring `pass` as needed for your selected profile, run the bootstrap in a terminal:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/maestro-bene/dotfiles/main/dot_local/bin/executable_bootstrap | bash
+```
+
+The bootstrap installs Homebrew and Chezmoi, initializes this repository, and starts the dotfiles installer. The installer asks you to choose a profile (`public`, `personal`, or `work`) and a multiplexer (`tmux` or `rex`), installs their dependencies, and asks for confirmation before applying the configuration. Your choices are saved in `~/.config/chezmoi/chezmoi.toml`.
+
+After applying the dotfiles, the installer runs `mise install`, `tv update-channels`, and `fisher update`. It also installs tmux plugins with `tpack install` when tmux is selected. **You do not need to run the installer again after the initial setup.**
+
+## 📝 Post-installation
+
+### Local Neovim environment variables
+
+Before the first `nvim` launch, create `~/.config/fish/secrets.fish` and set your local paths:
+
+```fish
+set -gx OBSIDIAN_VAULT path_to_obsidian_vault
+set -gx TREE_SITTER_LOGSTASH_PATH path_to_logstash_parser_repo
+```
+
+Replace the examples with your actual paths. `TREE_SITTER_LOGSTASH_PATH` must point to a clone of [`tree-sitter-logstash.nvim`](https://github.com/maestro-bene/tree-sitter-logstash.nvim). Fish loads this file automatically; launch Neovim from Fish so it inherits these variables.
+
+### Pi and Neovim
+
+- In Pi, configure a provider with `/login`, then choose a model with `/model`. This repository does not provide an account or credentials.
+- Neovim plugins install on the first `nvim` launch. Wait for installation to finish, then restart Neovim.
+
+## 🔄 Updates
+
+Chezmoi manages the dotfiles. After updating the source repository, review changes with `chezmoi diff`, then apply them with `chezmoi apply`. Update tmux plugins with `tpack update`.

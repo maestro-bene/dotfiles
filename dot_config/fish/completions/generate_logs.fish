@@ -1,15 +1,15 @@
-# Complétion fish pour generate_logs
-# Placer ce fichier dans : ~/.config/fish/completions/generate_logs.fish
+# Fish completion for generate_logs.
+# Install this file at ~/.config/fish/completions/generate_logs.fish.
 
-# Vrai si le token précédent immédiat est "-n" (on attend alors un nombre,
-# pas un nom de fichier).
+# Return true if the immediately preceding token is "-n" (which expects a number,
+# not a filename).
 function __generate_logs_prev_is_n
     set -l tokens (commandline -opc)
     test (count $tokens) -ge 1; and test "$tokens[-1]" = "-n"
 end
 
-# Liste les fichiers de log disponibles sous ~/automation/logs,
-# en excluant ceux déjà présents sur la ligne de commande.
+# List available log files under ~/automation/logs,
+# excluding files already present on the command line.
 function __generate_logs_available_files
     set -l log_dir "$HOME/automation/logs"
 
@@ -20,7 +20,7 @@ function __generate_logs_available_files
     set -l all_files (find "$log_dir" -type f -name '*.log' \
         | sed "s|^$log_dir/||; s/\.log\$//")
 
-    # Tokens déjà tapés (hors nom de la commande)
+    # Tokens already entered (excluding the command name)
     set -l tokens (commandline -opc)
     set -e tokens[1]
 
@@ -38,7 +38,7 @@ function __generate_logs_available_files
         if string match -q -- "-*" "$t"
             continue
         end
-        # Retirer un éventuel suffixe ":N" avant comparaison
+        # Remove any ":N" suffix before comparison
         set -a selected (string replace -r ':[0-9]*$' '' -- "$t")
     end
 
@@ -49,17 +49,17 @@ function __generate_logs_available_files
     end
 end
 
-# Désactiver la complétion de fichiers par défaut du shell
+# Disable the shell's default file completion
 complete -c generate_logs -f
 
 # Options
-complete -c generate_logs -s n -d "Nombre de répétitions par défaut" -r
-complete -c generate_logs -s h -d "Affiche l'aide"
+complete -c generate_logs -s n -d "Number of repetitions" -r
+complete -c generate_logs -s h -d "Show help"
 
-# Complétion des fichiers de log, sauf juste après -n
+# Complete log files, except immediately after -n
 complete -c generate_logs \
     -n "not __generate_logs_prev_is_n" \
     -a "(__generate_logs_available_files)" \
-    -d "Fichier de log"
+    -d "Log file"
 
 

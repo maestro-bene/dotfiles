@@ -7,28 +7,28 @@ function smart_diff()
 		if other_dir ~= "" and other_dir ~= current_dir then
 			local output = vim.fn.system(string.format("diff -ru '%s' '%s'", current_dir, other_dir))
 
-			-- Créer un nouveau buffer vide
+			-- Create a new empty buffer
 			local new_buf = vim.api.nvim_create_buf(false, true)
 
-			-- Ouvrir le split et basculer vers le nouveau buffer
+			-- Open a split and switch to the new buffer
 			vim.cmd("vsplit")
 			vim.api.nvim_set_current_buf(new_buf)
 
-			-- Configurer le buffer
+			-- Configure the buffer
 			vim.bo.filetype = "diff"
 			vim.bo.buftype = "nofile"
 			vim.bo.swapfile = false
 
-			-- Insérer le contenu
+			-- Insert the content
 			vim.api.nvim_buf_set_lines(new_buf, 0, -1, false, vim.split(output, "\n"))
 			vim.bo.modifiable = false
 
-			-- Mappings pour fermer
+			-- Add mappings to close the buffer
 			vim.keymap.set("n", "q", ":q<CR>", { buffer = new_buf })
 			vim.keymap.set("n", "<C-w>q", ":q<CR>", { buffer = new_buf })
 		end
 	else
-		-- Logique pour les buffers normaux
+		-- Handle regular buffers
 		local current_file = vim.api.nvim_buf_get_name(0)
 		if current_file == "" then
 			return
@@ -52,23 +52,23 @@ function smart_diff()
 		if target ~= "" then
 			local output = vim.fn.system(string.format("diff -u '%s' '%s'", current_file, target))
 
-			-- Créer un nouveau buffer vide
+			-- Create a new empty buffer
 			local new_buf = vim.api.nvim_create_buf(false, true)
 
-			-- Ouvrir le split et basculer vers le nouveau buffer
+			-- Open a split and switch to the new buffer
 			vim.cmd("vsplit")
 			vim.api.nvim_set_current_buf(new_buf)
 
-			-- Configurer le buffer
+			-- Configure the buffer
 			vim.bo.filetype = "diff"
 			vim.bo.buftype = "nofile"
 			vim.bo.swapfile = false
 
-			-- Insérer le contenu
+			-- Insert the content
 			vim.api.nvim_buf_set_lines(new_buf, 0, -1, false, vim.split(output, "\n"))
 			vim.bo.modifiable = false
 
-			-- Mappings pour fermer
+			-- Add mappings to close the buffer
 			vim.keymap.set("n", "q", ":q<CR>", { buffer = new_buf })
 			vim.keymap.set("n", "<C-w>q", ":q<CR>", { buffer = new_buf })
 		end

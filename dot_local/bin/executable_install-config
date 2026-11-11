@@ -15,6 +15,10 @@ fail() {
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 source_root="$(cd -- "$script_dir/../.." && pwd -P)"
+if [[ ! -f "$source_root/.chezmoi.toml.tmpl" ]] && command -v chezmoi >/dev/null 2>&1; then
+  source_candidate="$(chezmoi source-path 2>/dev/null || true)"
+  [[ ! -f "$source_candidate/.chezmoi.toml.tmpl" ]] || source_root="$source_candidate"
+fi
 install_data="${XDG_DATA_HOME:-$HOME/.local/share}/install-dotfiles"
 [[ -d "$install_data" ]] || install_data="$script_dir/../share/install-dotfiles"
 [[ -f "$install_data/Brewfile" && -f "$install_data/apt-packages.txt" ]] || fail 'Install manifests are missing; expected them in ~/.local/share/install-dotfiles.'
@@ -55,6 +59,26 @@ if [[ "$platform" == macos && "$arch" != arm64 && "$arch" != amd64 ]]; then
   fail "Unsupported macOS architecture: $arch."
 fi
 
+config_file="${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi/chezmoi.toml"
+config_template="$source_root/dot_config/chezmoi/chezmoi.toml.tmpl"
+config_choice() {
+  local key="$1" fallback="$2"
+  [[ -f "$config_file" ]] || { printf '%s' "$fallback"; return; }
+  awk -v key="$key" -v fallback="$fallback" '
+    /^\[data\][[:space:]]*$/ { in_data=1; next }
+    /^\[/ { in_data=0 }
+    in_data && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      sub(/^[^=]*=[[:space:]]*/, "")
+      gsub(/["[:space:]]/, "")
+      sub(/#.*/, "")
+      print
+      found=1
+      exit
+    }
+    END { if (!found) print fallback }
+  ' "$config_file"
+}
+
 prompt_choice() {
   local label="$1" default="$2" answer choice
   shift 2
@@ -73,8 +97,10 @@ prompt_choice() {
   done
 }
 
-profile="$(prompt_choice 'Profile (public/personal/work)' public public personal work)"
-backend="$(prompt_choice 'Terminal/worktree backend (tmux/rex)' tmux tmux rex)"
+profile_default="$(config_choice profile public)"
+backend_default="$(config_choice multiplexer tmux)"
+profile="$(prompt_choice 'Profile (public/personal/work)' "$profile_default" public personal work)"
+backend="$(prompt_choice 'Terminal/worktree backend (tmux/rex)' "$backend_default" tmux rex)"
 
 if [[ "$backend" == rex ]]; then
   case "$platform/$arch" in
@@ -105,15 +131,6 @@ if [[ "$platform" == linux ]]; then
   done < "$install_data/apt-packages.txt"
   ((${#apt_packages[@]} > 0)) || fail "No packages found in $install_data/apt-packages.txt."
   sudo apt-get install -y "${apt_packages[@]}"
-  # These are Homebrew's documented bootstrap requirements and are not in the
-  # curated APT list. Install only either tool that is currently missing.
-  missing_bootstrap=()
-  command -v git >/dev/null 2>&1 || missing_bootstrap+=(git)
-  command -v curl >/dev/null 2>&1 || missing_bootstrap+=(curl)
-  if [[ ${#missing_bootstrap[@]} -gt 0 ]]; then
-    printf 'Installing Homebrew bootstrap requirements: %s\n' "${missing_bootstrap[*]}"
-    sudo apt-get install -y "${missing_bootstrap[@]}"
-  fi
 fi
 
 find_brew() {
@@ -130,11 +147,7 @@ find_brew() {
   return 1
 }
 
-if ! brew_bin="$(find_brew)"; then
-  printf '\nHomebrew is not installed. Starting the official Homebrew installer.\n'
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew_bin="$(find_brew)" || fail 'Homebrew installer finished, but brew was not found. Follow the official installer next steps and rerun this script.'
-fi
+brew_bin="$(find_brew)" || fail 'Homebrew is not on PATH. Run the repository bootstrap command first and follow Homebrew setup instructions.'
 
 if [[ "$platform" == linux ]]; then
   # Configure this process without editing the user's shell startup files.
@@ -192,7 +205,39 @@ IFS= read -r apply_answer
 case "$apply_answer" in
   y|Y|yes|YES|Yes)
     chezmoi --override-data "$chezmoi_data" apply
-    printf '\nSelected profile/backend applied. To retain this choice for future chezmoi commands, set data.profile = %s and data.multiplexer = %s in your chezmoi config.\n' "$profile" "$backend"
+    printf '\nSaved profile and backend in %s via chezmoi apply.\n' "$config_file"
+
+    brew_prefix="$($brew_bin --prefix)"
+    mise_bin="$brew_prefix/bin/mise"
+    tv_bin="$brew_prefix/bin/tv"
+    printf '\nInstalling Mise tools...\n'
+    "$mise_bin" install
+    printf '\nUpdating Television channels...\n'
+    "$tv_bin" update-channels
+
+    fish_bin="$brew_prefix/bin/fish"
+    [[ -x "$fish_bin" ]] || fail "Fish was not found at $fish_bin after installing the manifest."
+    printf '\nInstalling Fish plugins with fisher update...\n'
+    "$fish_bin" -lc 'fisher update'
+    if [[ "$platform" == linux ]]; then
+      if ! grep -Fxq "$fish_bin" /etc/shells; then
+        printf '%s\n' "$fish_bin" | sudo tee -a /etc/shells >/dev/null
+      fi
+      current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+    else
+      current_shell="$(dscl . -read "/Users/$USER" UserShell | awk '{print $2}')"
+      if ! grep -Fxq "$fish_bin" /etc/shells; then
+        printf '%s\n' "$fish_bin" | sudo tee -a /etc/shells >/dev/null
+      fi
+    fi
+    if [[ "$current_shell" != "$fish_bin" ]]; then
+      chsh -s "$fish_bin"
+    fi
+
+    if [[ "$backend" == tmux ]]; then
+      printf '\nInstalling tmux plugins with Tpack...\n'
+      "$brew_prefix/bin/tpack" install
+    fi
 
     printf '\nInstalling Pi with its official installer...\n'
     curl -fsSL https://pi.dev/install.sh | sh

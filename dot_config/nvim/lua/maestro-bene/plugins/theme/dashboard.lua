@@ -2,29 +2,29 @@ return {
   "nvimdev/dashboard-nvim",
   event = "VimEnter",
   config = function()
-    -- Utils: cd helpers selon le scope
+    -- Helpers to change directories based on the selected scope
     local function cd_to(path)
       if path and #path > 0 then
         vim.cmd("cd " .. vim.fn.fnameescape(path))
       end
     end
 
-    -- Extraire "premier répertoire après base"
-    -- ex: base="~/dev", file="~/dev/acme/app/src/main.go" -> cd "~/dev/acme"
+    -- Extract the first directory below the base path.
+    -- Example: base="~/dev", file="~/dev/acme/app/src/main.go" -> cd "~/dev/acme"
     local function cd_first_after_base(base, file)
       local b = vim.fn.expand(base)
       local f = vim.fn.fnamemodify(file, ":p")
       if not vim.startswith(f, b .. "/") then
         return
       end
-      local rest = f:sub(#b + 2) -- après "b/"
+      local rest = f:sub(#b + 2) -- Skip "b/"
       local first = rest:match("([^/]+)")
       if first then
         cd_to(b .. "/" .. first)
       end
     end
 
-    -- Telescope wrapper: ouvre puis applique une action de cd optionnelle
+    -- Telescope wrapper: open the selection, then optionally change directories
     local function picker_with_cd(picker, opts, cd_action)
       local builtin = require("telescope.builtin")
       local actions = require("telescope.actions")
@@ -34,7 +34,7 @@ return {
       opts.attach_mappings = function(prompt_bufnr, map)
         local function open_and_maybe_cd()
           local sel = action_state.get_selected_entry()
-          actions.select_default(prompt_bufnr) -- ouvre le fichier
+          actions.select_default(prompt_bufnr) -- Open the file
           if sel and sel.path and cd_action then
             cd_action(sel.path)
           end
@@ -47,22 +47,22 @@ return {
       builtin[picker](opts)
     end
 
-    -- Récents (pas de cd spécial)
+    -- Directory navigation
     vim.api.nvim_create_user_command("Zoxide", function()
       require("telescope").extensions.zoxide.list()
     end, { desc = "Fuzzy find zoxide list" })
 
-    -- Récents (pas de cd spécial)
+    -- Recent files (no special directory change)
     vim.api.nvim_create_user_command("RecentHere", function()
       picker_with_cd("oldfiles", { cwd_only = false }, nil)
-    end, { desc = "Fichiers récents (sans cd spécial)" })
+    end, { desc = "Recent files (no special directory change)"})
 
-    -- Find Files général (pas de cd spécial)
+    -- Find files in any location (no special directory change)
     vim.api.nvim_create_user_command("FilesHere", function()
       picker_with_cd("find_files", { hidden = true, follow = true }, nil)
-    end, { desc = "Find files (sans cd spécial)" })
+    end, { desc = "Find files (no special directory change)"})
 
-    -- Scope: ~/.config -> cd au premier dossier après ~/.config
+    -- Scope: ~/.config -> change to the first directory below ~/.config
     vim.api.nvim_create_user_command("FilesConfig", function()
       picker_with_cd(
         "find_files",
@@ -71,11 +71,11 @@ return {
           cd_first_after_base("~/.config", path)
         end
       )
-    end, { desc = "Find files dans ~/.config -> cd premier dir après ~/.config" })
+    end, { desc = "Find files in ~/.config and change to the first subdirectory"})
 
-    -- Scope: ~/.config/nvim -> idem (premier dossier après ~/.config) ou après ~/.config/nvim ?
-    -- D'après la demande: pour .config on cible 'premier répertoire après .config'.
-    -- Donc on réutilise la même règle base=~/.config (et non ~/.config/nvim).
+    -- Scope: ~/.config/nvim -> use the same rule as ~/.config.
+    -- The first directory below ~/.config is the target,
+    -- so reuse base=~/.config rather than base=~/.config/nvim.
     vim.api.nvim_create_user_command("FilesNvim", function()
       picker_with_cd(
         "find_files",
@@ -84,14 +84,14 @@ return {
           cd_first_after_base("~/.config", path)
         end
       )
-    end, { desc = "Find files dans nvim -> cd premier dir après ~/.config" })
+    end, { desc = "Find files in nvim and change to the first directory below ~/.config"})
 
-    -- Scope: ~/dev -> cd premier dossier après ~/dev (racine projet)
+    -- Scope: ~/dev -> change to the first directory below ~/dev (project root)
     vim.api.nvim_create_user_command("FilesDev", function()
       picker_with_cd("find_files", { cwd = vim.fn.expand("~/dev"), hidden = true, follow = true }, function(path)
         cd_first_after_base("~/dev", path)
       end)
-    end, { desc = "Find files dans ~/dev -> cd racine projet (1er dir)" })
+    end, { desc = "Find files in ~/dev and change to the project root"})
 
     require("dashboard").setup({
       theme = "doom",

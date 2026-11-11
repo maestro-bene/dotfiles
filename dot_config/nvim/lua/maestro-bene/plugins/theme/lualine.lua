@@ -5,7 +5,7 @@ return {
     local lualine = require("lualine")
     local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
-    -- configure lualine with modified theme
+    -- Configure lualine with a modified theme
     lualine.setup({
       options = {
         theme = "catppuccin-nvim",

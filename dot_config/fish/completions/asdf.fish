@@ -57,7 +57,7 @@ end
 complete -f -c asdf -n __fish_asdf_needs_command -a plugin -d "Plugin management sub-commands"
 # suggest `add` after `plugin`
 complete -f -c asdf -n '__fish_asdf_using_command plugin; and __fish_asdf_arg_number 2' -a add -d "Add git repo as plugin"
-# show available plugins after `plugin add`
+# Show available plugins after `plugin add`
 complete -f -c asdf -n '__fish_asdf_using_command plugin; and __fish_asdf_arg_at 2 = "add"; and __fish_asdf_arg_number 3' -a '(__fish_asdf_plugin_list_all | grep -v \'*\' | awk \'{ print $1 }\')'
 # show repository urls for selected plugin
 complete -f -c asdf -n '__fish_asdf_using_command plugin; and __fish_asdf_arg_at 2 = "add"; and __fish_asdf_arg_number 4' -a '(__fish_asdf_plugin_list_all | grep (__fish_asdf_arg_at 3) | awk \'{ print $2 }\')'

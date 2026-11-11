@@ -1,4 +1,4 @@
 return {
-	-- Place here all plugins that don't need configuration
+	-- Place plugins here that do not need configuration
 	"christoomey/vim-tmux-navigator", -- tmux & split window navigation
 }

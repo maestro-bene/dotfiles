@@ -2,3 +2,4 @@
 # Install only when data.multiplexer = "tmux".
 brew "tmux"
 brew "workmux"
+brew "tmuxpack/tpack/tpack"

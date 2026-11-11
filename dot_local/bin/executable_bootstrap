@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fail() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+case "$(uname -s)" in
+Darwin)
+  if ! command -v brew >/dev/null 2>&1; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+  brew install git
+  if ! command -v chezmoi >/dev/null 2>&1; then
+    brew install chezmoi
+  fi
+  ;;
+Linux)
+  command -v apt-get >/dev/null 2>&1 || fail 'Linux bootstrap supports Debian/Ubuntu with apt-get.'
+  command -v sudo >/dev/null 2>&1 || fail 'sudo is required to install bootstrap packages.'
+  sudo apt-get update
+  # curl must already be present to run the curl | bash bootstrap command.
+  # Install only Git and Homebrew's Linux build prerequisites here; the
+  # project installer later installs the remaining APT manifest.
+  sudo apt-get install -y git build-essential procps file
+  if [[ ! -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  if ! command -v chezmoi >/dev/null 2>&1; then
+    brew install chezmoi
+  fi
+  ;;
+*)
+  fail 'Supported systems are macOS and Debian/Ubuntu Linux.'
+  ;;
+esac
+
+command -v git >/dev/null 2>&1 || fail 'git is required; on macOS install Xcode Command Line Tools and rerun.'
+command -v curl >/dev/null 2>&1 || fail 'curl is required.'
+command -v brew >/dev/null 2>&1 || fail 'Homebrew installation failed; follow its instructions and rerun.'
+command -v chezmoi >/dev/null 2>&1 || fail 'chezmoi could not be installed.'
+
+chezmoi init maestro-bene
+chezmoi cd
+./dot_local/bin/executable_install-config

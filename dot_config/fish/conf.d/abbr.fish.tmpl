@@ -1,186 +1,138 @@
-# NOTE: manage fish abbreviations
+# Fish abbreviations
 # https://fishshell.com/docs/current/cmds/abbr.html
+# Define abbreviations unconditionally. Availability checks can prevent them
+# from being registered when a command is missing from PATH at startup.
 
-if command -q mise
-    abbr ml 'mise ls'
-    abbr mi 'mise install'
-    abbr mu 'mise use'
-    abbr mx 'mise exec --'
-end
+abbr ml 'mise ls'
+abbr mi 'mise install'
+abbr mu 'mise use'
+abbr mx 'mise exec --'
 
-if command -q brew
-    abbr bi "brew install"
-    abbr bu "brew uninstall"
-end
+abbr bi 'brew install'
+abbr bu 'brew uninstall'
+abbr c 'clear'
+abbr cm 'chezmoi cd'
 
-abbr c "clear"
+abbr dc 'docker compose'
+abbr dcu 'docker compose up -d --build'
+abbr dcd 'docker compose down -v'
+abbr dcr 'docker compose restart'
+abbr dps 'docker ps'
+abbr dsp 'docker system prune'
+abbr e 'exit'
 
-if command -q chezmoi
-    abbr cm "chezmoi cd"
-end
+abbr fi 'fisher install'
+abbr fr 'fisher refresh'
+abbr fu 'fisher update'
+abbr fl 'fisher list'
 
-if command -q docker
-    abbr dc "docker compose"
-    abbr dcu "docker compose up -d --build"
-    abbr dcd "docker compose down -v"
-    abbr dcr "docker compose restart"
-    abbr dps "docker ps"
-    abbr dsp "docker system prune"
-end
-
-abbr e "exit"
-
-if functions -q fisher
-    abbr fi "fisher install"
-    abbr fr "fisher refresh"
-    abbr fu "fisher update"
-    abbr fl "fisher list"
-end
-
-if command -q git
-    abbr ga "git add ."
-    abbr gb "git branch -v"
-    abbr gc "git commit"
-    abbr gco "git checkout"
-    abbr gd "git branch --delete"
-    abbr gf "git fetch --all"
-    abbr gpom "git pull origin main"
-    abbr grao "git remote add origin"
-    abbr gs "git status"
-end
+abbr ga 'git add .'
+abbr gb 'git branch -v'
+abbr gc 'git commit'
+abbr gco 'git checkout'
+abbr gd 'git branch --delete'
+abbr gf 'git fetch --all'
+abbr gpom 'git pull origin main'
+abbr grao 'git remote add origin'
+abbr gs 'git status'
 
 {{- if eq .multiplexer "tmux" }}
-if command -q fzf-tmux
-    abbr hd "history delete --exact --case-sensitive \'(history | fzf-tmux -p -m)\'"
-end
+abbr hd "history delete --exact --case-sensitive '(history | fzf-tmux -p -m)'"
 {{- end }}
 
-if command -q lsd
-    abbr l "lsd --group-dirs first"
-    abbr ls "lsd --group-dirs first"
-    abbr ll "lsd --group-dirs first -l"
-    abbr la "lsd --group-dirs first -A"
-    abbr lla "lsd --group-dirs first -Al"
-    abbr lt "lsd --group-dirs last -A --tree"
-end
-if command -q lazygit
-    abbr lg "lazygit"
-end
+abbr l 'lsd --group-dirs first'
+abbr ls 'lsd --group-dirs first'
+abbr ll 'lsd --group-dirs first -l'
+abbr la 'lsd --group-dirs first -A'
+abbr lla 'lsd --group-dirs first -Al'
+abbr lt 'lsd --group-dirs last -A --tree'
+abbr lg 'lazygit'
 
-if command -q mvn
-    abbr mci "mvn clean install"
-end
-
-if command -q npm
-    abbr nb "npm run build"
-    abbr nd "npm run dev"
-    abbr ni "npm install"
-    abbr nt "npm run test"
-end
+abbr mci 'mvn clean install'
+abbr nb 'npm run build'
+abbr nd 'npm run dev'
+abbr ni 'npm install'
+abbr nt 'npm run test'
 
 {{- if eq .chezmoi.os "darwin" }}
-if command -q pbcopy
-    abbr pwdc "pwd | pbcopy"
-end
+abbr pwdc 'pwd | pbcopy'
 {{- else }}
-if command -q wl-copy
-    abbr pwdc "pwd | wl-copy"
-end
+abbr pwdc 'pwd | wl-copy'
 {{- end }}
 
-abbr rmr "rm -r"
-
-if command -q fish
-    abbr sf "source ~/.config/fish/config.fish"
-end
-{{- if eq .multiplexer "tmux" }}
-if command -q tmux
-    abbr st "tmux source ~/.config/tmux/tmux.conf"
-end
-{{- else }}
-if command -q rex
-    abbr st "rex config reload"
-end
-{{- end }}
-
-if command -q nvim
-    abbr rconfig "cd ~/.config && nvim . ; cd -"
-    abbr v "nvim"
-    abbr vd "nvim ."
-    abbr vimc "nvim ~/.config/vim/vimrc"
-end
-if command -q nvim; and command -q fd; and command -q fzf
-    abbr vfzf "nvim (fd --type f --hidden --follow --exclude .git | fzf)"
-end
-if command -q nvim
-    abbr vgrep "nvim +Grep"
-end
+abbr rmr 'rm -r'
+abbr sf 'source ~/.config/fish/config.fish'
 
 {{- if eq .multiplexer "tmux" }}
-if command -q tmux
-    abbr ta "tmux a"
-    abbr tat "tmux attach -t"
-    abbr tk "tmux kill-server"
-    abbr tkt "tmux kill-session -t"
-    abbr tls "tmux list-sessions"
-    abbr tlw "tmux list-windows"
-    abbr tn "tmux new -s (basename (pwd))"
-end
+abbr st 'tmux source ~/.config/tmux/tmux.conf'
+abbr ta 'tmux a'
+abbr tat 'tmux attach -t'
+abbr tk 'tmux kill-server'
+abbr tkt 'tmux kill-session -t'
+abbr tls 'tmux list-sessions'
+abbr tlw 'tmux list-windows'
+abbr tn 'tmux new -s (basename (pwd))'
+{{- else }}
+abbr st 'rex config reload'
 {{- end }}
-abbr td "t .config"
-if command -q tldr; and command -q fzf
-    abbr tr "tldr --list | fzf --header 'tldr (tealdeer)' --reverse --preview 'tldr {1} --color=always' --preview-window=right,80% | xargs tldr"
-end
+
+abbr rconfig 'cd ~/.config && nvim . ; cd -'
+abbr v 'nvim'
+abbr vd 'nvim .'
+abbr vimc 'nvim ~/.config/vim/vimrc'
+abbr vfzf 'nvim (fd --type f --hidden --follow --exclude .git | fzf)'
+abbr vgrep 'nvim +Grep'
+
+abbr td 't .config'
+abbr tr "tldr --list | fzf --header 'tldr (tealdeer)' --reverse --preview 'tldr {1} --color=always' --preview-window=right,80% | xargs tldr"
 
 #abbr tt "touch t && chmod +x t && echo -e '#!/usr/bin/env bash\n' > t && nvim t"
 
-if command -q fzf
-    abbr x "chmod +x (ls | fzf --header='chmod +x')"
-    abbr nx "chmod -x (ls | fzf --header='chmod -x')"
-end
+abbr x "chmod +x (ls | fzf --header='chmod +x')"
+abbr nx "chmod -x (ls | fzf --header='chmod -x')"
 
 {{- if eq .multiplexer "tmux" }}
-    set -l workmux_cmd workmux
+abbr wm 'workmux'
+abbr wml 'workmux list'
+abbr wmd 'workmux dashboard'
+abbr wmp 'workmux path'
+abbr wma 'workmux add'
+abbr wmo 'workmux open'
+abbr wmi 'workmux init'
+abbr wmce 'workmux config edit'
+abbr wmm 'workmux merge'
+abbr wmr 'workmux remove'
 {{- else }}
-    set -l workmux_cmd workrex
+abbr wm 'workrex'
+abbr wml 'workrex list'
+abbr wmd 'workrex dashboard'
+abbr wmp 'workrex path'
+abbr wma 'workrex add'
+abbr wmo 'workrex open'
+abbr wmi 'workrex init'
+abbr wmce 'workrex config edit'
+abbr wmm 'workrex merge'
+abbr wmr 'workrex remove'
 {{- end }}
-    set -l workmux_command (command -s $workmux_cmd)
-if test -n "$workmux_command"
-    abbr wm "$workmux_cmd"
-    abbr wml "$workmux_cmd list"
-    abbr wmd "$workmux_cmd dashboard"
-    abbr wmp "$workmux_cmd path"
-    abbr wma "$workmux_cmd add"
-    abbr wmo "$workmux_cmd open"
-    abbr wmi "$workmux_cmd init"
-    abbr wmce "$workmux_cmd config edit"
-    abbr wmm "$workmux_cmd merge"
-    abbr wmr "$workmux_cmd remove"
-end
 
-if command -q wget
-    abbr wgh "wget --spider https://www.github.com"
-end
+abbr wgh 'wget --spider https://www.github.com'
 
-if command -q chezmoi
-    abbr ze "chezmoi edit"
-    abbr fishc "chezmoi edit ~/.config/fish/; chezmoi apply; source ~/.config/fish/config.fish"
-    abbr sshc "chezmoi edit ~/.ssh/config"
-    abbr config "chezmoi edit ~/.config; chezmoi apply;"
+abbr ze 'chezmoi edit'
+abbr fishc 'chezmoi edit ~/.config/fish/; chezmoi apply; source ~/.config/fish/config.fish'
+abbr sshc 'chezmoi edit ~/.ssh/config'
+abbr config 'chezmoi edit ~/.config; chezmoi apply;'
 {{- if eq .multiplexer "tmux" }}
-    abbr tmuxc "chezmoi edit ~/.config/tmux/tmux.conf; tmux source ~/.config/tmux/tmux.conf"
+abbr tmuxc 'chezmoi edit ~/.config/tmux/tmux.conf; tmux source ~/.config/tmux/tmux.conf'
 {{- else }}
-    abbr rexc "chezmoi edit ~/.config/rex/; chezmoi apply; rex config reload"
+abbr rexc 'chezmoi edit ~/.config/rex/; chezmoi apply; rex config reload'
 {{- end }}
-    abbr nvimc "chezmoi edit ~/.config/nvim/ ; chezmoi apply"
-    abbr bashc "chezmoi edit ~/.config/bash/bashrc"
-    abbr gitc "chezmoi edit ~/.gitconfig"
-    abbr zcd "chezmoi cd"
-    abbr zd "chezmoi diff"
-    abbr zs "chezmoi status"
-    abbr za "chezmoi apply"
-end
-if command -q nvim
-    abbr rfishc "nvim ~/.config/fish/"
-    abbr rsshc "cd ~/.ssh && nvim ~/.ssh/config.d"
-end
+abbr nvimc 'chezmoi edit ~/.config/nvim/; chezmoi apply'
+abbr bashc 'chezmoi edit ~/.config/bash/bashrc'
+abbr gitc 'chezmoi edit ~/.gitconfig'
+abbr zcd 'chezmoi cd'
+abbr zd 'chezmoi diff'
+abbr zs 'chezmoi status'
+abbr za 'chezmoi apply'
+
+abbr rfishc 'nvim ~/.config/fish/'
+abbr rsshc 'cd ~/.ssh && nvim ~/.ssh/config.d'

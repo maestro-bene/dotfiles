@@ -6,10 +6,10 @@
 #  macOS:   `$HOME/.config/television/config.toml`
 #  Windows: `%LocalAppData%\television\config\config.toml`
 #
-# XDG dirs:
-# ---------
-# You may use XDG_CONFIG_HOME if set on your system.
-# In that case, television will expect the configuration file to be in:
+# XDG directories:
+# ----------------
+# Set XDG_CONFIG_HOME to use a different configuration directory.
+# Television will then expect the configuration file at:
 # `$XDG_CONFIG_HOME/television/config.toml`
 #
 
@@ -51,7 +51,7 @@ ui_scale = 100
 orientation = "landscape"
 # The theme to use for the UI
 # A list of builtin themes can be found in the `themes` directory of the television
-# repository. You may also create your own theme by creating a new file in a `themes`
+# repository. You may also create your own theme by adding a file to a `themes`
 # directory in your configuration directory (see the `config.toml` location above).
 theme = "catppuccin"
 
@@ -193,13 +193,12 @@ fallback_channel = "files"
 [shell_integration.channel_triggers]
 # Add your channel triggers here. Each key is a channel that will be triggered
 # by the corresponding commands.
-# Example: say you want the following commands to trigger the following channels
-# when pressing <CTRL-T>:
+# Example: map the following commands to channels when pressing <CTRL-T>:
 #          `git checkout`  should trigger the `git-branches` channel
 #          `ls`            should trigger the `dirs` channel
 #          `cat` and `cp`  should trigger the `files` channel
 #
-# You would add the following to your configuration file:
+# Add the following to your configuration file:
 # ```
 # [shell_integration.channel_triggers]
 # "git-branches" = ["git checkout"]

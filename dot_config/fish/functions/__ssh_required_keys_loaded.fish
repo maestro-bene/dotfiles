@@ -1,9 +1,9 @@
 function __ssh_required_keys_loaded
-    # Interroge uniquement l'agent hérité.
+    # Query only the inherited agent.
     set -l agent_keys (command ssh-add -l -E sha256 2>/dev/null)
     or return 1
 
-    # Compare les empreintes des deux clés publiques locales.
+    # Compare the fingerprints of the two local public keys.
     for pub in "$HOME/.ssh/id_ed25519.pub" "$HOME/.ssh/id_rsa.pub"
         test -r "$pub"
         or return 1

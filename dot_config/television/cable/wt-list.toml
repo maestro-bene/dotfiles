@@ -9,10 +9,10 @@ command = "wt list --format json | jq '.[].branch'"
 command = "wt switch '{}'; git log --oneline -10"
 
 [ui]
-# customize the UI
+# Customize the UI
 
 [keybindings]
-# customize keybindings
+# Customize keybindings
 
 [actions]
-# define external actions
+# Define external actions

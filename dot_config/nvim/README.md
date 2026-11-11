@@ -1,4 +1,4 @@
-# Neovim configuration
+# Neovim Configuration
 
 This configuration is managed as part of the dotfiles repository with chezmoi. The canonical source lives at `dot_config/nvim`; the separate legacy repository is retained unchanged for now.
 
@@ -17,8 +17,16 @@ The dotfiles mise manifest (`~/.config/mise/config.toml`) declares shared langua
 ## First launch
 
 1. Install the dotfiles requirements and apply chezmoi, following the root README.
-2. Start `nvim`. `lazy.nvim` bootstraps itself and installs the pinned plugins from `lazy-lock.json`.
-3. Wait for plugin installation/builds to finish, then restart Neovim. Treesitter parsers and Mason tools may install on first launch.
+2. Before starting Neovim, create `~/.config/fish/secrets.fish` and set the local paths used by the Obsidian and Logstash parser integrations:
+
+   ```fish
+   set -gx OBSIDIAN_VAULT path_to_obsidian_vault
+   set -gx TREE_SITTER_LOGSTASH_PATH path_to_logstash_parser_repo
+   ```
+
+   Replace these placeholders with your actual paths. `TREE_SITTER_LOGSTASH_PATH` should point to a clone of [`tree-sitter-logstash.nvim`](https://github.com/maestro-bene/tree-sitter-logstash.nvim). Fish loads this file automatically; launch Neovim from Fish for these variables to be available.
+3. Start `nvim`. `lazy.nvim` bootstraps itself and installs the pinned plugins from `lazy-lock.json`.
+4. Wait for plugin installation/builds to finish, then restart Neovim. Treesitter parsers and Mason tools may install on first launch.
 
 To review plugins, use `:Lazy`. To review LSP servers and tools, use `:Mason`.
 

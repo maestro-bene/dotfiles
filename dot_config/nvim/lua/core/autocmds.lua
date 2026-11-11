@@ -49,7 +49,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Create file if doesn't exist when writing buffer
 vim.api.nvim_create_autocmd("BufWritePre", {
   callback = function(args)
-    -- args.match = chemin du buffer (peut être "oil:/..."), args.buf = bufnr
+    -- args.match is the buffer path (possibly "oil:/..."); args.buf is the buffer number
     local name = args.match or vim.api.nvim_buf_get_name(args.buf)
     if name:match("^oil:") then
       return

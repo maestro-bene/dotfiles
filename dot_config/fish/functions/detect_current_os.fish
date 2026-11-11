@@ -1,4 +1,4 @@
-function detect_current_os -d "Détecte l'OS actuel"
+function detect_current_os -d "Detect the current operating system"
     switch (uname -s)
         case "Linux"
             if test -f /proc/version

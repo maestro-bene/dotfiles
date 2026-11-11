@@ -58,7 +58,7 @@ function __sesh_perform_completion
     printf "%s\n" "$directiveLine"
 end
 
-# this function limits calls to __sesh_perform_completion, by caching the result behind $__sesh_perform_completion_once_result
+# Limit calls to __sesh_perform_completion by caching the result in $__sesh_perform_completion_once_result
 function __sesh_perform_completion_once
     __sesh_debug "Starting __sesh_perform_completion_once"
 
@@ -77,7 +77,7 @@ function __sesh_perform_completion_once
     return 0
 end
 
-# this function is used to clear the $__sesh_perform_completion_once_result variable after completions are run
+# Clear $__sesh_perform_completion_once_result after completions are run
 function __sesh_clear_perform_completion_once_result
     __sesh_debug ""
     __sesh_debug "========= clearing previously set __sesh_perform_completion_once_result variable =========="
@@ -127,7 +127,7 @@ function __sesh_prepare_completions
 
     if test -z "$__sesh_perform_completion_once_result"
         __sesh_debug "No completion, probably due to a failure"
-        # Might as well do file completion, in case it helps
+        # Also try file completion in case it helps
         return 1
     end
 
@@ -150,7 +150,7 @@ function __sesh_prepare_completions
     set -l compErr (math (math --scale 0 $directive / $shellCompDirectiveError) % 2)
     if test $compErr -eq 1
         __sesh_debug "Received error directive: aborting."
-        # Might as well do file completion, in case it helps
+        # Also try file completion in case it helps
         return 1
     end
 
@@ -180,13 +180,13 @@ function __sesh_prepare_completions
         set --global __sesh_comp_results $completions
         __sesh_debug "Filtered completions are: $__sesh_comp_results"
 
-        # Important not to quote the variable for count to work
+        # Leave the variable unquoted so count can inspect its elements
         set -l numComps (count $__sesh_comp_results)
         __sesh_debug "numComps: $numComps"
 
         if test $numComps -eq 1; and test $nospace -ne 0
             # We must first split on \t to get rid of the descriptions to be
-            # able to check what the actual completion will be.
+            # able to check the actual completion result.
             # We don't need descriptions anyway since there is only a single
             # real completion which the shell will expand immediately.
             set -l split (string split --max 1 \t $__sesh_comp_results[1])
@@ -226,7 +226,7 @@ complete --do-complete "sesh " > /dev/null 2>&1
 # Remove any pre-existing completions for the program since we will be handling all of them.
 complete -c sesh -e
 
-# this will get called after the two calls below and clear the $__sesh_perform_completion_once_result global
+# Clear the $__sesh_perform_completion_once_result global after the calls below
 complete -c sesh -n '__sesh_clear_perform_completion_once_result'
 # The call to __sesh_prepare_completions will setup __sesh_comp_results
 # which provides the program's completion choices.

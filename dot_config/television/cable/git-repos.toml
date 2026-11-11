@@ -8,7 +8,7 @@ This channel uses `fd` to find directories that contain a `.git` subdirectory, a
 """
 
 [source]
-# this is a macos version of the command. While perfectly usable on linux, you may want to tweak it a bit.
+# This command targets macOS. It also works on Linux, but you may want to adjust it.
 command = "fd -g .git -HL -t d -d 10 --prune ~ -E 'Library' -E 'Application Support' --exec dirname '{}'"
 display = "{split:/:-1}"
 

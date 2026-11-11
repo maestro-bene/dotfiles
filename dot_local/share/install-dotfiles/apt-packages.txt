@@ -1,6 +1,4 @@
-# Minimal Ubuntu/Debian system prerequisites builds.
-# Git and curl are needed earlier to bootstrap chezmoi/Homebrew.
-build-essential
-procps
-file
+# Additional Ubuntu/Debian packages, beyond the bootstrap prerequisites.
+# The bootstrap installs git, build-essential, procps, and file before Homebrew.
 unzip
+man-db

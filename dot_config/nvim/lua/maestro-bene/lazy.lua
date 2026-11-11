@@ -39,7 +39,7 @@ require("lazy").setup({
     notify = false,
   },
   git = {
-    timeout = 600, -- secondes (ex: 10 min)
+    timeout = 600, -- seconds (e.g. 10 minutes)
   },
   ui = { border = "rounded" },
 })

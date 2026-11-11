@@ -16,9 +16,8 @@ local function blocks(window)
   return found
 end
 
--- The app keeps its own current tab, which can differ from the session's
--- active window, so the layer goes into the tab of the pane the key was
--- pressed in.
+-- The app's current tab can differ from the session's active window, so place
+-- the layer in the tab containing the pane where the key was pressed.
 local function target_window(view, block_id)
   for _, window in ipairs(view.windows or {}) do
     for _, block in ipairs(blocks(window)) do
@@ -44,7 +43,7 @@ local function find_dashboard(window)
   end
 end
 
--- A dashboard that fails at startup leaves its block open with the error.
+-- If the dashboard fails at startup, its block remains open with the error.
 local function still_running(block_id)
   local process = rex.block.call(TERMINAL, "process", { block_id = block_id })
   return process ~= nil and process.last_exit == nil
@@ -87,8 +86,8 @@ rex.action{
       rex.session.close_layer{ layer_id = existing_layer }
     end
 
-    -- The origin block stands in for the dashboard's own block when the
-    -- dashboard asks which pane is active.
+    -- The origin block stands in for the dashboard block when it asks which
+    -- pane is active.
     local command = { "env" }
     if ctx.block_id ~= nil then
       table.insert(command, "WORKREX_REX_ORIGIN_BLOCK=" .. ctx.block_id)

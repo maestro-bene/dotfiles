@@ -50,14 +50,14 @@ return {
         "vimdoc",
         "yaml",
       }
-      -- Highlight TS auto pour tous les buffers "normaux"
+      -- Automatically enable Treesitter highlighting for all regular buffers
       vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufNewFile" }, {
         callback = function(args)
           local bufnr = args.buf
           local bt = vim.bo[bufnr].buftype
           local ft = vim.bo[bufnr].filetype
 
-          -- skip buffers spéciaux
+          -- Skip special buffers
           if bt ~= "" then
             return
           end

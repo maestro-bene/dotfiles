@@ -1,5 +1,7 @@
--- sex loader for Rex. Loaded by plugin managers from lua/sex.lua, or written by `sex plugin install`.
--- On each config load it asks the installed sex for the plugin, so upgrades need no new copy.
+-- Rex loader for sex. Plugin managers load it from lua/sex.lua; alternatively,
+-- install it with `sex plugin install`.
+-- It fetches the plugin from the installed sex executable on every config load,
+-- so upgrades do not require a new local copy.
 local home = os.getenv("HOME") or ""
 local user = os.getenv("USER") or ""
 local candidates = {
@@ -20,7 +22,7 @@ local function exists(path)
   return true
 end
 
--- SEX_BIN stays out of the list: an unset variable would be nil and end ipairs early.
+-- Keep SEX_BIN out of this list: an unset variable would be nil and stop ipairs early.
 local function find()
   local env = os.getenv("SEX_BIN")
   if env ~= nil and env ~= "" then return env end
@@ -37,8 +39,8 @@ end
 
 local M = {}
 
--- rex.log does not show up in `rex config reload`, so a failed load keeps the actions
--- and reports the reason when one runs, and to `sex doctor` through sex_version.
+-- rex.log is not shown by `rex config reload`, so preserve the actions on load
+-- failure and report the reason when one runs. Also expose it to `sex doctor` via sex_version.
 local function broken(reason)
   local msg = "sex: " .. reason
   rex.log("warn", msg)
@@ -48,7 +50,7 @@ local function broken(reason)
   rex.action{ name = "sex_version", title = "sex_version", run = function() return { error = msg } end }
 end
 
--- opts.bin overrides the search. All other options go to the plugin.
+-- opts.bin overrides executable discovery. All other options are passed to the plugin.
 function M.setup(opts)
   local given = opts or {}
   opts = {}

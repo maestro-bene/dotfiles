@@ -8,7 +8,7 @@
 # Structure:
 #   00 — Logging
 #   10 — Shared shell and OS environment
-#   20 — Static PATH and Homebrew discovery
+#   20 — Static PATH and Homebrew
 #   30 — Development runtimes and editor defaults
 #   40 — Optional shared CLI settings (bat, vivid, fzf)
 #   50 — User secrets
@@ -19,7 +19,7 @@
 # Profile and backend-specific manifests add tools only when selected; integrations
 # remain optional and are skipped when their executable is unavailable.
 # Custom functions are maintained separately in functions/.
-# Mise activation is configured explicitly below and works with non-Homebrew installs.
+# Mise activation is configured explicitly below.
 
 
 # --- 00. Logging ---
@@ -60,21 +60,30 @@ set -gx NO_PROXY "localhost,127.0.0.1,::1"
 set -gx no_proxy "$NO_PROXY"
 
 
-# --- 20. Static PATH and Homebrew discovery ---
+# --- 20. Static PATH and Homebrew ---
 
-# Homebrew is optional (the Brewfile is the shared package baseline); when
-# present, resolve its prefix and add its executable directories below.
-# Stable destinations for tools installed with "go install".
-set -gx GOPATH "$HOME/go"
-set -gx GOBIN "$HOME/go/bin"
+# Select the platform's Homebrew prefix once; don't rely on brew discovery in PATH.
+set -gx HOMEBREW_PATH ''
+switch (uname -s)
+    case Darwin
+        if test (uname -m) = arm64
+            set -gx HOMEBREW_PATH /opt/homebrew
+        else
+            set -gx HOMEBREW_PATH /usr/local
+        end
+    case Linux
+        set -gx HOMEBREW_PATH /home/linuxbrew/.linuxbrew
+end
 
-set -l brew_cmd (command -s brew)
-
-if test -n "$brew_cmd"
-    set -gx HOMEBREW_PATH (dirname (dirname "$brew_cmd"))
+set -l brew_cmd "$HOMEBREW_PATH/bin/brew"
+if test -x "$brew_cmd"
     set -gx HOMEBREW_NO_ENV_HINTS 1
     log "✅ Homebrew configured: $HOMEBREW_PATH"
 end
+
+# Stable destinations for tools installed with "go install".
+set -gx GOPATH "$HOME/go"
+set -gx GOBIN "$HOME/go/bin"
 
 # Static PATH priority, highest first:
 #   1. Go user-installed tools
@@ -91,7 +100,7 @@ set -l static_paths \
     "$HOME/.local/bin" \
     "$HOME/.local/share/nvim/mason/bin"
 
-if test -n "$brew_cmd"
+if test -x "$brew_cmd"
     set -a static_paths \
         "$HOMEBREW_PATH/bin" \
         "$HOMEBREW_PATH/sbin"
