@@ -1,11 +1,11 @@
 ---
 name: credential-handoff
-description: Safely handle commands that may require a GPG/YubiKey PIN, passphrase, signing key, or interactive authentication unavailable to Pi. Use before chezmoi operations involving encrypted data, signed Git commits/tags, or other commands that may prompt for hardware-backed credentials.
+description: MANDATORY before any chezmoi CLI command, and before Git/GPG/SSH operations that may prompt for a hardware key, PIN, passphrase, signing key, or interactive authentication. Never assume a chezmoi command is safe because it appears read-only.
 ---
 
 # Credential-dependent command handoff
 
-Use this workflow when a command may need a secret, a hardware key, a pinentry prompt, or interactive authentication that may not be available in Pi's shell.
+Load and follow this workflow before invoking the chezmoi CLI for any reason, including apparently read-only commands such as `status`, `diff`, `cat`, `execute-template`, or inspecting managed files. Do not decide that a particular chezmoi command is safe based on its name or apparent read-only behavior: templates or managed files can trigger decryption or pinentry. Also use this workflow before Git/GPG/SSH operations that may require a secret, hardware key, pinentry prompt, or interactive authentication unavailable to Pi.
 
 ## Non-negotiable rules
 
@@ -17,8 +17,7 @@ Use this workflow when a command may need a secret, a hardware key, a pinentry p
 
 ## Workflow
 
-1. **Identify the likely prompt before running the command.** Examples include:
-   - `chezmoi status`, `diff`, `apply`, `execute-template`, or similar operations when templates or managed files need GPG decryption;
+1. **Identify the likely prompt before running the command.** For chezmoi, treat every CLI invocation as potentially credential-dependent, including `status`, `diff`, `apply`, `cat`, `execute-template`, and other inspection commands. Examples of other operations include:
    - `git commit`, signed tags, or other Git operations that invoke commit/tag signing or a hook requiring a key;
    - direct GPG signing/decryption, and SSH operations that require a hardware-backed key, touch, PIN, or agent confirmation.
 2. **Do all safe preparation first.** Inspect the relevant files and configuration, check the working-tree diff/status when possible without triggering decryption, and run checks that do not need credentials. For changes, show the user what would be affected. Never apply chezmoi changes to the target home directory without the user's explicit approval.
