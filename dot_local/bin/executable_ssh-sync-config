@@ -21,7 +21,8 @@ for path in "$HOME/.profile" "$HOME/.config/bash" "$HOME/.config/vim"; do
   [[ -e "$path" || -L "$path" ]] || fail "required local config is missing: $path (apply chezmoi first)"
 done
 
-remote_script=$(cat <<'REMOTE_SCRIPT'
+remote_script=$(
+  cat <<'REMOTE_SCRIPT'
 set -euo pipefail
 umask 077
 mkdir -p "$HOME/.cache" "$HOME/.local/state/chezmoi-ssh-backups"
@@ -89,5 +90,9 @@ remote_script_b64=$(printf '%s' "$remote_script" | base64 | tr -d '\r\n')
 remote_command="bash -c \"\$(printf '%s' '$remote_script_b64' | base64 -d)\""
 
 # Disable LocalCommand for the nested transport connection to prevent recursion.
-tar -czf - -C "$HOME" .bashrc .profile .config/bash .config/vim \
-  | ssh -T -o PermitLocalCommand=no -p "$port" "$remote_user@$host" "$remote_command"
+tar -czf - -C "$HOME" .bashrc .profile .config/bash .config/vim |
+  ssh -T \
+    -o PermitLocalCommand=no \
+    -o ControlMaster=no \
+    -o ControlPath=none \
+    -p "$port" "$remote_user@$host" "$remote_command"

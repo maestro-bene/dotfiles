@@ -1,7 +1,7 @@
 {{- $tool := "workmux" -}}{{- if eq .multiplexer "rex" -}}{{- $tool = "workrex" -}}{{- end -}}
 ---
 name: coordinator
-description: Coordinate worktree agents with {{ $tool }}: dispatch tasks, monitor progress, and review or merge results.
+description: Coordinate worktree agents with {{ $tool }} dispatch tasks, monitor progress, and review or merge results.
 allowed-tools: Bash, Write, Read, Task
 ---
 
