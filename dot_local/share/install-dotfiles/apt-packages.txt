@@ -2,3 +2,6 @@
 # The bootstrap installs git, build-essential, procps, and file before Homebrew.
 unzip
 man-db
+# Full Vim: Ubuntu/WSL images usually ship only vim-tiny, which cannot load
+# ~/.config/vim/vimrc or the vim-plug plugins managed by ~/.local/bin/vim-plugins.
+vim

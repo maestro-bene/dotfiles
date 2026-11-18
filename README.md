@@ -5,6 +5,7 @@ Personal configuration managed with [chezmoi](https://www.chezmoi.io/) for **mac
 - **Terminal:** Ghostty, Rex, or another terminal emulator
 - **Multiplexer:** tmux or Rex
 - **Shell:** Fish by default, with Bash available
+- **Editors:** Neovim with Lazy, and Vim with vim-plug
 - **Navigation:** Zoxide, Television, and Sesh/Sex
 - **Coding agent:** [Pi](https://pi.dev/)
 
@@ -102,6 +103,36 @@ set -gx TREE_SITTER_LOGSTASH_PATH path_to_logstash_parser_repo
 
 Replace the examples with your actual paths. `TREE_SITTER_LOGSTASH_PATH` must point to a clone of [`tree-sitter-logstash.nvim`](https://github.com/maestro-bene/tree-sitter-logstash.nvim). Fish loads this file automatically; launch Neovim from Fish so it inherits these variables.
 
+### Vim plugins
+
+Vim reads `~/.config/vim/vimrc` and loads its plugins with [vim-plug](https://github.com/junegunn/vim-plug). Only the manifest is versioned:
+
+| Path | Managed by chezmoi |
+| ---- | ------------------ |
+| `~/.config/vim/vimrc`, `plugins.vim`, `remaps.vim`, `indent/`, `syntax/` | Yes |
+| `~/.config/vim/bundle/` (plugin checkouts), `autoload/plug.vim` | No, generated |
+
+Edit `~/.config/vim/plugins.vim` and run `chezmoi apply`: a chezmoi script re-runs `vim-plugins install` whenever the manifest changes, so plugins are installed on a new machine without any extra step. The helper is also usable directly:
+
+| Command              | Effect                                                                  |
+| -------------------- | ----------------------------------------------------------------------- |
+| `vim-plugins`        | Install missing plugins (same as `vim-plugins install`)                   |
+| `vim-plugins update` | Fetch the latest commit of every plugin and upgrade vim-plug              |
+| `vim-plugins clean`  | Remove plugin directories that are no longer in the manifest              |
+| `vim-plugins status` | Show the manifest, the manager, and the installed plugin directories      |
+
+Vim requires `git`, and `curl` on the very first run to download vim-plug. A healthy start prints no error; check with `:messages`. If a leftover Pathogen layout is found (`~/.config/vim/autoload/pathogen.vim`), the first run moves `bundle/`, `colors/`, and Pathogen itself to `~/.local/state/vim-pathogen-backup-<timestamp>/`; delete that directory once Vim looks right.
+
+The main installer installs full `vim` from APT on Linux. macOS relies on the system Vim; install Homebrew's `vim` if yours ignores `~/.config/vim/vimrc`.
+
+### Synchronized SSH hosts
+
+`~/.local/bin/ssh-sync-config` runs as an OpenSSH `LocalCommand` and pushes, for the matching account only, `~/.bashrc`, `~/.profile`, `~/.config/bash`, and the whole `~/.config/vim` tree. The plugins are therefore copied to the remote host, which is what makes offline hosts usable, but the per-plugin git metadata is excluded from the transfer. Keep this in mind:
+
+- Update plugins **locally** (`vim-plugins update`); the next SSH connection propagates them.
+- The remote copy has no `.git`, so `vim-plugins update` must not be run on a synchronized host.
+- Since the whole tree is copied, files removed from your local `~/.config/vim` disappear remotely too (previous versions are kept under `~/.local/state/chezmoi-ssh-backups/`).
+
 ### Pi and Neovim
 
 - In Pi, configure a provider with `/login`, then choose a model with `/model`. This repository does not provide an account or credentials.
@@ -109,4 +140,4 @@ Replace the examples with your actual paths. `TREE_SITTER_LOGSTASH_PATH` must po
 
 ## 🔄 Updates
 
-Chezmoi manages the dotfiles. After updating the source repository, review changes with `chezmoi diff`, then apply them with `chezmoi apply`. Update tmux plugins with `tpack update`.
+Chezmoi manages the dotfiles. After updating the source repository, review changes with `chezmoi diff`, then apply them with `chezmoi apply`. Update tmux plugins with `tpack update`, Vim plugins with `vim-plugins update`, and Fish plugins with `fisher update`.

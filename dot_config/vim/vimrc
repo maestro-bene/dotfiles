@@ -1,11 +1,22 @@
+" Line continuations and the plug block below need vim defaults, not vi
+" compatibility (also required when the file is loaded with `vim -u`).
+set nocompatible
+
 " User plugins and overrides live under ~/.config/vim.
 let s:vim_config = expand('~/.config/vim')
 execute 'set runtimepath^=' . fnameescape(s:vim_config)
 execute 'set runtimepath+=' . fnameescape(s:vim_config . '/after')
 execute 'set packpath^=' . fnameescape(s:vim_config)
 
-" Active Pathogen
-execute pathogen#infect()
+" Plugins: vim-plug, declared in ~/.config/vim/plugins.vim and installed by
+" ~/.local/bin/vim-plugins, which `chezmoi apply` runs for you.
+if filereadable(s:vim_config . '/autoload/plug.vim')
+  execute 'source ' . fnameescape(s:vim_config . '/plugins.vim')
+else
+  echohl WarningMsg
+  echomsg 'vim-plug is missing: run ~/.local/bin/vim-plugins install'
+  echohl None
+endif
 
 " Thème Catppuccin
 syntax enable

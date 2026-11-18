@@ -90,9 +90,13 @@ remote_script_b64=$(printf '%s' "$remote_script" | base64 | tr -d '\r\n')
 remote_command="bash -c \"\$(printf '%s' '$remote_script_b64' | base64 -d)\""
 
 # Disable LocalCommand for the nested transport connection to prevent recursion.
-tar -czf - -C "$HOME" .bashrc .profile .config/bash .config/vim |
+# The plugin checkouts under .config/vim/bundle are transmitted (remote hosts are
+# often offline), but their git metadata is not: it is 8 MB of the payload and is
+# only needed to update plugins, which is done locally with ~/.local/bin/vim-plugins.
+tar -czf - \
+  --exclude='.config/vim/bundle/*/.git' \
+  --exclude='.config/vim/.netrwhist' \
+  -C "$HOME" .bashrc .profile .config/bash .config/vim |
   ssh -T \
     -o PermitLocalCommand=no \
-    -o ControlMaster=no \
-    -o ControlPath=none \
     -p "$port" "$remote_user@$host" "$remote_command"

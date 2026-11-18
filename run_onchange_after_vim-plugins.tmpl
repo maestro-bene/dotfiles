@@ -1,0 +1,10 @@
+#!/bin/sh
+# chezmoi: keep the Vim plugins in sync with the versioned manifest.
+# vim-plugins manifest checksum: {{ include (print .chezmoi.sourceDir "/dot_config/vim/plugins.vim") | sha256sum }}
+# The checksum above makes the script re-run when plugins.vim changes, and only
+# then. Missing network access must not break `chezmoi apply`.
+if [ -x "$HOME/.local/bin/vim-plugins" ]; then
+  "$HOME/.local/bin/vim-plugins" install ||
+    printf 'vim-plugins: install failed (offline?); run ~/.local/bin/vim-plugins install later\n' >&2
+fi
+exit 0

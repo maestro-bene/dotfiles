@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install or update the Vim plugins declared in ~/.config/vim/plugins.vim.
+#
+# Same pattern as fisher (Fish) and Tpack (tmux): the manifest is versioned by
+# chezmoi, the plugin checkouts are not. Only git is required; curl is used once
+# to fetch vim-plug itself. Chezmoi runs `vim-plugins install` whenever the
+# manifest changes, so a plain `chezmoi apply` is enough on a new machine.
+
+VIM_CONFIG="$HOME/.config/vim"
+MANIFEST="$VIM_CONFIG/plugins.vim"
+PLUG_AUTOLOAD="$VIM_CONFIG/autoload/plug.vim"
+PLUG_URL="https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+
+fail() {
+  printf 'vim-plugins: %s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+Usage: vim-plugins [command]
+
+Commands:
+  install   Install missing plugins (default)
+  update    Update every plugin to its latest commit and upgrade vim-plug
+  clean     Remove plugin directories that are no longer in the manifest
+  status    Show the manifest, the manager, and the installed plugins
+  help      Show this message
+
+The manifest is ~/.config/vim/plugins.vim, managed by chezmoi. Plugins are
+checked out into ~/.config/vim/bundle and are deliberately not versioned.
+Running install or update also moves a leftover Pathogen setup aside once.
+EOF
+}
+
+[[ -f "$MANIFEST" ]] || fail "$MANIFEST is missing; run 'chezmoi apply' first"
+command -v git >/dev/null 2>&1 || fail 'git is required to manage vim plugins'
+vim_bin=${VIM_BIN:-vim}
+command -v "$vim_bin" >/dev/null 2>&1 || fail "vim not found: $vim_bin"
+
+# One-time migration from the old Pathogen layout. Plugins used to be cloned by
+# hand into ~/.config/vim/bundle and the colours were copied next to the vimrc.
+# vim-plug owns that directory now, so the leftovers are moved aside, never
+# deleted. The presence of autoload/pathogen.vim is what marks the old layout.
+migrate_legacy_pathogen() {
+  [[ -f "$VIM_CONFIG/autoload/pathogen.vim" ]] || return 0
+  local backup="$HOME/.local/state/vim-pathogen-backup-$(date +%Y%m%dT%H%M%S)"
+  mkdir -p "$backup"
+  local entry
+  for entry in bundle colors autoload/pathogen.vim; do
+    [[ -e "$VIM_CONFIG/$entry" ]] || continue
+    mkdir -p "$backup/$(dirname "$entry")"
+    mv "$VIM_CONFIG/$entry" "$backup/$entry"
+  done
+  printf 'vim-plugins: legacy Pathogen files moved to %s (safe to delete)\n' "$backup" >&2
+}
+
+ensure_plug() {
+  [[ -f "$PLUG_AUTOLOAD" ]] && return 0
+  command -v curl >/dev/null 2>&1 || fail 'curl is required to download vim-plug'
+  printf 'vim-plugins: downloading vim-plug...\n' >&2
+  mkdir -p "$VIM_CONFIG/autoload"
+  curl -fsSL --create-dirs -o "$PLUG_AUTOLOAD" "$PLUG_URL"
+}
+
+# Run vim without the user vimrc. Batch mode (-es) makes vim-plug synchronous,
+# and ~/.config/vim is put on the runtimepath so plug#begin() resolves through
+# the autoload directory, exactly like the real vimrc does.
+vim_batch() {
+  "$vim_bin" -u NONE -N -i NONE -es \
+    --cmd 'set rtp^=~/.config/vim' \
+    --cmd 'source ~/.config/vim/plugins.vim' \
+    "$@"
+}
+
+case ${1:-install} in
+install)
+  migrate_legacy_pathogen
+  ensure_plug
+  vim_batch -c 'PlugInstall --sync' -c 'qa!'
+  printf 'vim-plugins: plugins are up to date.\n' >&2
+  ;;
+update)
+  migrate_legacy_pathogen
+  ensure_plug
+  vim_batch -c 'PlugUpdate --sync' -c 'PlugUpgrade' -c 'qa!'
+  printf 'vim-plugins: plugins updated.\n' >&2
+  ;;
+clean)
+  ensure_plug
+  if [[ -t 0 && -t 1 ]]; then
+    exec "$vim_bin" -u NONE -N -i NONE \
+      --cmd 'set rtp^=~/.config/vim' \
+      --cmd 'source ~/.config/vim/plugins.vim' \
+      -c 'PlugClean'
+  fi
+  vim_batch -c 'PlugClean!' -c 'qa!'
+  ;;
+status)
+  declared=$(grep -c "^[[:space:]]*Plug[[:space:]]*'" "$MANIFEST" || true)
+  printf 'Manifest: %s (%s plugins declared)\n' "$MANIFEST" "$declared"
+  if [[ -f "$PLUG_AUTOLOAD" ]]; then
+    printf 'Manager:  vim-plug (%s)\n' "$PLUG_AUTOLOAD"
+  else
+    printf 'Manager:  vim-plug not installed yet\n'
+  fi
+  if [[ -d "$VIM_CONFIG/bundle" ]]; then
+    printf 'Plugins:  %s\n' "$VIM_CONFIG/bundle"
+    find "$VIM_CONFIG/bundle" -mindepth 1 -maxdepth 1 -type d \
+      -exec basename {} \; | LC_ALL=C sort | sed 's/^/  /'
+  else
+    printf 'Plugins:  none installed (run: vim-plugins install)\n'
+  fi
+  ;;
+help | -h | --help) usage ;;
+*)
+  usage >&2
+  fail "unknown command: $1"
+  ;;
+esac

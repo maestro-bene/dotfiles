@@ -19,4 +19,4 @@ Host *
 Host *
 Match User gcudennec SessionType shell
     PermitLocalCommand yes
-    LocalCommand ~/.local/bin/ssh-sync-config "%n" "%p" "%r"
+    LocalCommand /bin/sh -c 'nohup ~/.local/bin/ssh-sync-config "%n" "%p" "%r" >>/tmp/ssh-sync-config.log 2>&1 &'
