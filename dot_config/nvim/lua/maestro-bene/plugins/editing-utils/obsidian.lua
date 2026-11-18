@@ -4,7 +4,9 @@ return {
   version = "*",
   ft = "markdown",
   opts = {
-    disable_frontmatter = true,
+    frontmatter = {
+      enabled = false,
+    },
     legacy_commands = false,
     workspaces = {
       {
